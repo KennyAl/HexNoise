@@ -78,17 +78,6 @@ float FPerlinNoiseGenerator2D::InterpolatedNoise(float X, float Y)
 		MaxY[1] = Lerp(SmoothNoise(IntegerX + 1, IntegerY + 1), RawNoise2D(IntegerX + 1, IntegerY + 1), NoiseSettings.SmoothingFactor);
 	}
 
-	//// X-values for y
-	//float MinY[2] = {
-	//	SmoothNoise(IntegerX, IntegerY),
-	//	SmoothNoise(IntegerX + 1, IntegerY)
-	//};
-
-	//// X-values for y + 1
-	//float MaxY[2] = {
-	//	SmoothNoise(IntegerX, IntegerY + 1),
-	//	SmoothNoise(IntegerX + 1, IntegerY + 1)
-	//};
 
 	// "Draw the graph" around the given x coordinate using interpolation
 	float MinYInterp = (this ->* (InterpMethod3))(MinY[1], MinY[2], FractionalX);
@@ -107,16 +96,10 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 	int32 IntegerY = Y;
 	float FractionalY = Y - IntegerY;
 
-	// X-values for y - 1
-	// X-values for y
-	//float MinY[4];
-
-	// X-values for y + 1
-	//float MaxY[4];
-
 	// X-values for y + 2 
 	float SurroundingPoints[4][4];
 
+	// Generate the raw (or smoothed data for all relevant points
 	// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
 	if (NoiseSettings.bSmooth == false || NoiseSettings.SmoothingFactor < 0.001f)
 	{
@@ -164,26 +147,8 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 			}
 		}
 	}
-	// Surrounding x-values of the lower y-value
-	//float MinY[4] = {
-	//	SmoothNoise(IntegerX - 1, IntegerY),
-	//	SmoothNoise(IntegerX, IntegerY),
-	//	SmoothNoise(IntegerX + 1, IntegerY),
-	//	SmoothNoise(IntegerX + 2, IntegerY)
-	//};
 
-	//// Surrounding x-values of the upper y-value
-	//float MaxY[4] = {
-	//	SmoothNoise(IntegerX - 1, IntegerY + 1),
-	//	SmoothNoise(IntegerX, IntegerY + 1),
-	//	SmoothNoise(IntegerX + 1, IntegerY + 1),
-	//	SmoothNoise(IntegerX + 2, IntegerY + 1)
-	//};
-
-	// "Draw the graph" around the given x coordinate using cubic interpolation
-	//float MinYInterp = CubicInterp(MinY[0], MinY[1], MinY[2], MinY[3], FractionalX);
-	//float MaxYInterp = CubicInterp(MaxY[0], MaxY[1], MaxY[2], MaxY[3], FractionalX);
-
+	// Stores the interpolated data for all x values
 	float XValues[4];
 
 	// "Draw the graph" around the given x coordinate using cubic interpolation
@@ -191,9 +156,6 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 	{
 		XValues[Y] = (this->* (InterpMethod5))(SurroundingPoints[Y][0], SurroundingPoints[Y][1], SurroundingPoints[Y][3], SurroundingPoints[Y][4], FractionalX);
 	}
-
-	// Lerp between the two height values based on the position on the y
-	//return FMath::Lerp(MinYInterp, MaxYInterp, FractionalY);
 
 	// Interpolate between all values based on the position on the y
 	return (this->* (InterpMethod5))(XValues[0], XValues[1], XValues[2], XValues[3], FractionalY);
@@ -236,8 +198,7 @@ float FPerlinNoiseGenerator2D::CosineInterp(float V1, float V2, float A)
 
 float FPerlinNoiseGenerator2D::Lerp(float V1, float V2, float A)
 {
-	//UE_LOG(Editor, Warning, TEXT("Called"));
-	return 1.0f; //V1*(1 - A) + V2*A;
+	return V1*(1 - A) + V2*A;
 }
 
 float FPerlinNoiseGenerator2D::RawNoise3D(int32 _X, int32 _Y, int32 _Z)
@@ -322,7 +283,8 @@ void FPerlinNoiseGenerator2D::ChangeSettings(FPerlinNoiseSettings* Settings)
 		InterpMethod5 = &FPerlinNoiseGenerator2D::CubicInterp;
 		InterpHub = &FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise;
 	default:
-		// TODO: When exporting this to a plugin, define log category and notify the user at this point
+		// Notify the user at this point, since we never should end up here
+		UE_LOG(HexNoise, Warning, TEXT("No combination of functions, which would support this interpolation were found !"));
 		break;
 	}
 }

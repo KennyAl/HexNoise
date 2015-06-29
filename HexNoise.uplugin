@@ -1,0 +1,18 @@
+{
+	"FileVersion": 3,
+	"FriendlyName": "HexNoise",
+	"Version": 1,
+	"VersionName": "0.4",
+	"CreatedBy": "",
+	"CreatedByURL": "",
+	"Category": "Other",
+	"Description": "An user friendly noise generator for C++ and Blueprint",
+	"EnabledByDefault": false,
+	"Modules": [
+		{
+			"Name": "HexNoise",
+			"Type": "Developer",
+			"LoadingPhase": "Default"
+		}
+	]
+}

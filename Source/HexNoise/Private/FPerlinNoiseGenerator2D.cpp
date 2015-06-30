@@ -80,8 +80,8 @@ float FPerlinNoiseGenerator2D::InterpolatedNoise(float X, float Y)
 
 
 	// "Draw the graph" around the given x coordinate using interpolation
-	float MinYInterp = (this ->* (InterpMethod3))(MinY[1], MinY[2], FractionalX);
-	float MaxYInterp = (this ->* (InterpMethod3))(MaxY[1], MaxY[2], FractionalX);
+	float MinYInterp = (this ->* (InterpMethod3))(MinY[0], MinY[1], FractionalX);
+	float MaxYInterp = (this ->* (InterpMethod3))(MaxY[0], MaxY[1], FractionalX);
 
 	// Interpolate between the two values based on the position on the y
 	return (this ->* (InterpMethod3))(MinYInterp, MaxYInterp, FractionalY);
@@ -131,7 +131,7 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 		{
 			for (int32 X = 0; X < 4; X++)
 			{
-				SurroundingPoints[Y][X] = RawNoise2D(IntegerX - (X - 1), IntegerY - (Y - 1));
+				SurroundingPoints[Y][X] = RawNoise2D(IntegerX + (X - 1), IntegerY + (Y - 1));
 			}
 		}
 	}
@@ -142,8 +142,8 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 			for (int32 X = 0; X < 4; X++)
 			{
 				// Lerp between the smoothed and the raw noise based on the smoothing factor
-				SurroundingPoints[Y][X] = Lerp(SmoothNoise(IntegerX - (X - 1), IntegerY - (Y - 1)),
-					RawNoise2D(IntegerX - (X - 1), IntegerY - (Y - 1)), NoiseSettings.SmoothingFactor);
+				SurroundingPoints[Y][X] = Lerp(SmoothNoise(IntegerX + (X - 1), IntegerY + (Y - 1)),
+					RawNoise2D(IntegerX + (X - 1), IntegerY + (Y - 1)), NoiseSettings.SmoothingFactor);
 			}
 		}
 	}
@@ -154,7 +154,7 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 	// "Draw the graph" around the given x coordinate using cubic interpolation
 	for (int32 Y = 0; Y < 4; Y++)
 	{
-		XValues[Y] = (this->* (InterpMethod5))(SurroundingPoints[Y][0], SurroundingPoints[Y][1], SurroundingPoints[Y][3], SurroundingPoints[Y][4], FractionalX);
+		XValues[Y] = (this->* (InterpMethod5))(SurroundingPoints[Y][0], SurroundingPoints[Y][1], SurroundingPoints[Y][2], SurroundingPoints[Y][3], FractionalX);
 	}
 
 	// Interpolate between all values based on the position on the y

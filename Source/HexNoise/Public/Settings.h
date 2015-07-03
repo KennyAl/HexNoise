@@ -7,13 +7,13 @@ UENUM(BlueprintType)
 enum class EInterpMethod : uint8
 {
 	/** Lerping is fast and returns acceptable results, when applied to tile grids */
-	Lerp			UMETA(DisplayName = "Dance"),
+	Lerp			UMETA(DisplayName = "Lerp"),
 
 	/** Simple curves with not much overhead */
-	Cosine			UMETA(DisplayName = "Dance"),
+	Cosine			UMETA(DisplayName = "Cosine"),
 
 	/** Naturally looking results, comes at a high cost */
-	Cubic			UMETA(DisplayName = "Dance"),
+	Cubic			UMETA(DisplayName = "Cubic"),
 };
 
 USTRUCT(BlueprintType)

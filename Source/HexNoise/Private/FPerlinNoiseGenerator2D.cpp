@@ -189,7 +189,7 @@ float FPerlinNoiseGenerator2D::CubicInterp(float V0, float V1, float V2, float V
 float FPerlinNoiseGenerator2D::CosineInterp(float V1, float V2, float A)
 {
 	float Ft = A * 3.1415927;
-	float F = (1.0f - FMath::Cos(Ft) * 0.5f);
+	float F = (1.0f - FMath::Cos(Ft)) * 0.5f;
 
 	return V1 * (1.0f - F) + (V2 * F);
 }
@@ -282,6 +282,7 @@ void FPerlinNoiseGenerator2D::ChangeSettings(FPerlinNoiseSettings* Settings)
 	case EInterpMethod::Cubic:
 		InterpMethod5 = &FPerlinNoiseGenerator2D::CubicInterp;
 		InterpHub = &FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise;
+		break;
 	default:
 		// Notify the user at this point, since we never should end up here
 		UE_LOG(HexNoise, Warning, TEXT("No combination of functions, which would support this interpolation were found !"));

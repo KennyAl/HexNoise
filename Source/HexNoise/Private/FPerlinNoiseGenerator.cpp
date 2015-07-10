@@ -9,5 +9,7 @@ FPerlinNoiseGenerator::FPerlinNoiseGenerator()
 
 FPerlinNoiseGenerator::~FPerlinNoiseGenerator()
 {
-	delete Interpolation;
+	// Calling delete from anywhere in this dll will lead to problems with memory management
+	// Took it out for now, which will cause memory leaks
+	//delete Interpolation;
 }

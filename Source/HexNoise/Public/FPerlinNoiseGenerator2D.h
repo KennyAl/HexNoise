@@ -1,11 +1,10 @@
 
 #pragma once
 
-#include "Settings.h"
-#include "FInterpolation.h"
+#include "FPerlinNoiseGenerator.h"
 
-/** Generates perlin noise */
-class HEXNOISE_API FPerlinNoiseGenerator2D
+/** Generates 2d perlin noise */
+class HEXNOISE_API FPerlinNoiseGenerator2D : public FPerlinNoiseGenerator
 {
 public:
 
@@ -38,7 +37,7 @@ public:
 	/** Changes the settings used by the generator
 	* @param Settings	Pointer to the new settings
 	*/
-	void ChangeSettings(FPerlinNoiseSettings* Settings);
+	virtual void ChangeSettings(FPerlinNoiseSettings* Settings) override;
 
 private:
 
@@ -88,21 +87,9 @@ private:
 	*/
 	float InterpolatedNoise3D(float _X, float _Y, float _Z);
 
-	/** Holds the settings */
-	FPerlinNoiseSettings NoiseSettings;
-
-	/** Pointer to the interpolation method the user has chosen (used for methods that require only three params) */
-	float (FInterpolation::*InterpMethod3)(float, float, float);
-
-	/** Pointer to the interpolation method the user has chosen (used for methods that require five params) */
-	float (FInterpolation::*InterpMethod5)(float, float, float, float, float);
-
 	/** Pointer to the function fitting to the selected interpolation method
 	* e.g when selected "Lerp" this will point to a function which only calculates data for V1 and V2
 	* but when "Cubic" is selected this will point to a function which also calculates data for V0 and V3
 	*/
 	float (FPerlinNoiseGenerator2D::*InterpHub)(float, float);
-
-	/** Used for dereferencing the function pointers to the interpolation methods */
-	FInterpolation* Interpolation;
 };

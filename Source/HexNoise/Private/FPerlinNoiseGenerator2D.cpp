@@ -5,18 +5,7 @@
 
 FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D(FPerlinNoiseSettings* Settings)
 {
-	Interpolation = new FInterpolation;
 	ChangeSettings(Settings);
-}
-
-FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D()
-{
-	Interpolation = new FInterpolation;
-}
-
-FPerlinNoiseGenerator2D::~FPerlinNoiseGenerator2D()
-{
-	delete Interpolation;
 }
 
 float FPerlinNoiseGenerator2D::GetNoise(float _X, float _Y)
@@ -42,7 +31,7 @@ float FPerlinNoiseGenerator2D::GetNoise(float _X, float _Y)
 	return NoiseValue;
 }
 
-float FPerlinNoiseGenerator2D::RawNoise2D(int32 _X, int32 _Y)
+float FPerlinNoiseGenerator2D::RawNoise(int32 _X, int32 _Y)
 {
 	// TODO: Add support for a seed that gets add to the modifier in some way
 	// Doing some semi random operations on the modifier
@@ -73,20 +62,20 @@ float FPerlinNoiseGenerator2D::InterpolatedNoise(float X, float Y)
 	// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
 	if (NoiseSettings.bSmooth == false || NoiseSettings.SmoothingFactor < 0.001f)
 	{
-		MinY[0] = RawNoise2D(IntegerX, IntegerY);
-		MinY[1] = RawNoise2D(IntegerX + 1, IntegerY);
+		MinY[0] = RawNoise(IntegerX, IntegerY);
+		MinY[1] = RawNoise(IntegerX + 1, IntegerY);
 
-		MaxY[0] = RawNoise2D(IntegerX, IntegerY + 1);
-		MaxY[1] = RawNoise2D(IntegerX + 1, IntegerY + 1);
+		MaxY[0] = RawNoise(IntegerX, IntegerY + 1);
+		MaxY[1] = RawNoise(IntegerX + 1, IntegerY + 1);
 	}
 	else
 	{
 		// Lerp between the smoothed and the raw noise based on the smoothing factor
-		MinY[0] = Lerp(SmoothNoise(IntegerX, IntegerY), RawNoise2D(IntegerX, IntegerY), NoiseSettings.SmoothingFactor);
-		MinY[1] = Lerp(SmoothNoise(IntegerX + 1, IntegerY), RawNoise2D(IntegerX + 1, IntegerY), NoiseSettings.SmoothingFactor);
+		MinY[0] = Interpolation->Linear(SmoothNoise(IntegerX, IntegerY), RawNoise(IntegerX, IntegerY), NoiseSettings.SmoothingFactor);
+		MinY[1] = Interpolation->Linear(SmoothNoise(IntegerX + 1, IntegerY), RawNoise(IntegerX + 1, IntegerY), NoiseSettings.SmoothingFactor);
 
-		MaxY[0] = Lerp(SmoothNoise(IntegerX, IntegerY + 1), RawNoise2D(IntegerX, IntegerY + 1), NoiseSettings.SmoothingFactor);
-		MaxY[1] = Lerp(SmoothNoise(IntegerX + 1, IntegerY + 1), RawNoise2D(IntegerX + 1, IntegerY + 1), NoiseSettings.SmoothingFactor);
+		MaxY[0] = Interpolation->Linear(SmoothNoise(IntegerX, IntegerY + 1), RawNoise(IntegerX, IntegerY + 1), NoiseSettings.SmoothingFactor);
+		MaxY[1] = Interpolation->Linear(SmoothNoise(IntegerX + 1, IntegerY + 1), RawNoise(IntegerX + 1, IntegerY + 1), NoiseSettings.SmoothingFactor);
 	}
 
 
@@ -114,35 +103,11 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 	// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
 	if (NoiseSettings.bSmooth == false || NoiseSettings.SmoothingFactor < 0.001f)
 	{
-		//// X-values for y - 1
-		//SurroundingPoints[0][0] = RawNoise2D(IntegerX - 1, IntegerY - 1);
-		//SurroundingPoints[0][1] = RawNoise2D(IntegerX, IntegerY - 1);
-		//SurroundingPoints[0][2] = RawNoise2D(IntegerX + 1, IntegerY - 1);
-		//SurroundingPoints[0][3] = RawNoise2D(IntegerX + 2, IntegerY - 1);
-
-		//// X-values for y 
-		//SurroundingPoints[1][0] = RawNoise2D(IntegerX - 1, IntegerY);
-		//SurroundingPoints[1][1] = RawNoise2D(IntegerX, IntegerY);
-		//SurroundingPoints[1][2] = RawNoise2D(IntegerX + 1, IntegerY);
-		//SurroundingPoints[1][3] = RawNoise2D(IntegerX + 2, IntegerY);
-		//																							// TODO: Condense this into a clean loop
-		//// X-values for y + 1
-		//SurroundingPoints[2][0] = RawNoise2D(IntegerX - 1, IntegerY + 1);
-		//SurroundingPoints[2][1] = RawNoise2D(IntegerX, IntegerY + 1);
-		//SurroundingPoints[2][2] = RawNoise2D(IntegerX + 1, IntegerY + 1);
-		//SurroundingPoints[2][3] = RawNoise2D(IntegerX + 2, IntegerY + 1);
-
-		//// X-values for y + 2
-		//SurroundingPoints[3][0] = RawNoise2D(IntegerX - 1, IntegerY + 2);
-		//SurroundingPoints[3][1] = RawNoise2D(IntegerX, IntegerY + 2);
-		//SurroundingPoints[3][2] = RawNoise2D(IntegerX + 1, IntegerY + 2);
-		//SurroundingPoints[3][3] = RawNoise2D(IntegerX + 2, IntegerY + 2);
-
 		for (int32 Y = 0; Y < 4; Y++)
 		{
 			for (int32 X = 0; X < 4; X++)
 			{
-				SurroundingPoints[Y][X] = RawNoise2D(IntegerX + (X - 1), IntegerY + (Y - 1));
+				SurroundingPoints[Y][X] = RawNoise(IntegerX + (X - 1), IntegerY + (Y - 1));
 			}
 		}
 	}
@@ -153,8 +118,8 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 			for (int32 X = 0; X < 4; X++)
 			{
 				// Lerp between the smoothed and the raw noise based on the smoothing factor
-				SurroundingPoints[Y][X] = Lerp(SmoothNoise(IntegerX + (X - 1), IntegerY + (Y - 1)),
-					RawNoise2D(IntegerX + (X - 1), IntegerY + (Y - 1)), NoiseSettings.SmoothingFactor);
+				SurroundingPoints[Y][X] = Interpolation->Linear(SmoothNoise(IntegerX + (X - 1), IntegerY + (Y - 1)),
+					RawNoise(IntegerX + (X - 1), IntegerY + (Y - 1)), NoiseSettings.SmoothingFactor);
 			}
 		}
 	}
@@ -175,80 +140,19 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 float FPerlinNoiseGenerator2D::SmoothNoise(float X, float Y)
 {
 	// Get the height values of the corners, they are considered less important for the smoothed height
-	float Corners = (RawNoise2D(X - 1, Y - 1) + RawNoise2D(X + 1, Y - 1) +
-		RawNoise2D(X - 1, Y + 1) + RawNoise2D(X + 1, Y + 1)) / 16.0f;
+	float Corners = (RawNoise(X - 1, Y - 1) + RawNoise(X + 1, Y - 1) +
+		RawNoise(X - 1, Y + 1) + RawNoise(X + 1, Y + 1)) / 16.0f;
 
 	// Get the height values of the corners, they influence the end result twice as much as the corners
-	float Sides = (RawNoise2D(X - 1, Y) + RawNoise2D(X + 1, Y) + RawNoise2D(X, Y - 1) + RawNoise2D(X, Y + 1)) / 8.0f;
+	float Sides = (RawNoise(X - 1, Y) + RawNoise(X + 1, Y) + RawNoise(X, Y - 1) + RawNoise(X, Y + 1)) / 8.0f;
 
 	// The height of the center is most important
-	float Center = RawNoise2D(X, Y) / 4.0f;
+	float Center = RawNoise(X, Y) / 4.0f;
 
 	// Add it all together to get the smoothed height
 	return Corners + Sides + Center;
 }
 
-float FPerlinNoiseGenerator2D::RawNoise3D(int32 _X, int32 _Y, int32 _Z)
-{
-	FRandomStream Rand;
-	Rand.Initialize(_X + _Y + _Z);
-	return Rand.FRandRange(-1.0f, 1.0f);
-}
-
-float FPerlinNoiseGenerator2D::InterpolatedNoise3D(float _X, float _Y, float _Z)
-{
-	// Single out the fractions of the coordinates
-	int32 Integer_X = _X;
-	float Fractional_X = _X - Integer_X;
-
-	int32 Integer_Y = _Y;
-	float Fractional_Y = _Y - Integer_Y;
-
-	int32 Integer_Z = _Z;
-	float Fractional_Z = _Z - Integer_Z;
-
-	float LowerMinY[2]{
-		RawNoise3D(Integer_X, Integer_Y, Integer_Z),
-			RawNoise3D(Integer_X + 1, Integer_Y, Integer_Z)
-	};
-
-	float LowerMaxY[2]{
-		RawNoise3D(Integer_X, Integer_Y + 1, Integer_Z),
-			RawNoise3D(Integer_X + 1, Integer_Y + 1, Integer_Z)
-	};
-
-	float UpperMinY[2]{
-		RawNoise3D(Integer_X, Integer_Y, Integer_Z + 1),
-			RawNoise3D(Integer_X + 1, Integer_Y, Integer_Z + 1)
-	};
-
-	float UpperMaxY[2]{
-		RawNoise3D(Integer_X, Integer_Y + 1, Integer_Z + 1),
-			RawNoise3D(Integer_X + 1, Integer_Y + 1, Integer_Z + 1)
-	};
-
-	float LowerMinYInterp = FMath::Lerp(LowerMinY[0], LowerMinY[1], Fractional_X);
-	float LowerMaxYInterp = FMath::Lerp(LowerMaxY[0], LowerMaxY[1], Fractional_X);
-	float UpperMinYInterp = FMath::Lerp(UpperMinY[0], UpperMinY[1], Fractional_X);
-	float UpperMaxYInterp = FMath::Lerp(UpperMaxY[0], UpperMaxY[1], Fractional_X);
-
-	float LowerYInterp = FMath::Lerp(LowerMinYInterp, LowerMaxYInterp, Fractional_Y);
-	float UpperYInterp = FMath::Lerp(UpperMinYInterp, UpperMaxYInterp, Fractional_Y);
-
-	return FMath::Lerp(LowerYInterp, UpperYInterp, Fractional_Z);
-}
-
-float FPerlinNoiseGenerator2D::PerlinNoise3D(float _X, float _Y, float _Z)
-{
-	// The noise value for that coordinates after adding all octaves together
-	float TotalValue = 0.0f;
-
-	float Frequency = 0.8f;//Settings.InitialFrequency;
-
-	float Amplitude = 28.0f;//Settings.InitialAmplitude;
-
-	return TotalValue += AdvancedInterpolatedNoise(_X * Frequency, _Y * Frequency) * Amplitude;
-}
 
 void FPerlinNoiseGenerator2D::ChangeSettings(FPerlinNoiseSettings* Settings)
 {

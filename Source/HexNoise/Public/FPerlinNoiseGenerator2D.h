@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Settings.h"
+#include "FInterpolation.h"
 
 /** Generates perlin noise */
 class HEXNOISE_API FPerlinNoiseGenerator2D
@@ -9,19 +10,22 @@ class HEXNOISE_API FPerlinNoiseGenerator2D
 public:
 
 	/** Default constructor, generator uses default settings */
-	FPerlinNoiseGenerator2D(){}
+	FPerlinNoiseGenerator2D();
 
 	/** Constructor
 	* @param Settings	Pointer to the settings for the generator
 	*/
 	FPerlinNoiseGenerator2D(FPerlinNoiseSettings* Settings);
 
+	/** Destructor */
+	~FPerlinNoiseGenerator2D();
+
 	/** Generates perlin noise for a specified pair of coordinates
 	* @param X	The X coordinate
 	* @param Y	The Y coordinate
 	* @returns	The noise value
 	*/
-	float PerlinNoise2D(float _X, float _Y);
+	float GetNoise(float _X, float _Y);
 
 	/** Generates perlin noise for a specified pair of coordinates
 	* @param X	The X coordinate
@@ -67,33 +71,6 @@ private:
 	*/
 	float SmoothNoise(float X, float Y);
 
-	/** Performs a cubic interpolation
-	* @param V0		The point before a
-	* @param V1		The point a
-	* @param V2		The point b
-	* @param V3		The point after b
-	* @param A		The alpha value
-	* @returns		The interpolated value
-	*/
-	float CubicInterp(float V0, float V1, float V2, float V3, float A);
-
-	/** Performs a cosine interpolation
-	* @param V1		The point a
-	* @param V2		The point b
-	* @param A		The alpha value
-	* @returns		The interpolated value
-	*/
-	float CosineInterp(float V1, float V2, float A);
-
-
-	/** Performs a linear interpolation
-	* @param V1		The point a
-	* @param V2		The point b
-	* @param A		The alpha
-	* @returns		The interpolated value
-	*/
-	float Lerp(float V1, float V2, float A);
-
 	/** Generates raw, unsmoothed, and not interpolated noise for x, y and z coordinates
 	* DOES NOT TAKES A SEED INTO CONSIDERATION
 	* @param X	The X coordinate
@@ -115,14 +92,17 @@ private:
 	FPerlinNoiseSettings NoiseSettings;
 
 	/** Pointer to the interpolation method the user has chosen (used for methods that require only three params) */
-	float (FPerlinNoiseGenerator2D::*InterpMethod3)(float, float, float);
+	float (FInterpolation::*InterpMethod3)(float, float, float);
 
 	/** Pointer to the interpolation method the user has chosen (used for methods that require five params) */
-	float (FPerlinNoiseGenerator2D::*InterpMethod5)(float, float, float, float, float);
+	float (FInterpolation::*InterpMethod5)(float, float, float, float, float);
 
 	/** Pointer to the function fitting to the selected interpolation method
 	* e.g when selected "Lerp" this will point to a function which only calculates data for V1 and V2
 	* but when "Cubic" is selected this will point to a function which also calculates data for V0 and V3
 	*/
 	float (FPerlinNoiseGenerator2D::*InterpHub)(float, float);
+
+	/** Used for dereferencing the function pointers to the interpolation methods */
+	FInterpolation* Interpolation;
 };

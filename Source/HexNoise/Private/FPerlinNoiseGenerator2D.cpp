@@ -5,10 +5,21 @@
 
 FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D(FPerlinNoiseSettings* Settings)
 {
+	Interpolation = new FInterpolation;
 	ChangeSettings(Settings);
 }
 
-float FPerlinNoiseGenerator2D::PerlinNoise2D(float _X, float _Y)
+FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D()
+{
+	Interpolation = new FInterpolation;
+}
+
+FPerlinNoiseGenerator2D::~FPerlinNoiseGenerator2D()
+{
+	delete Interpolation;
+}
+
+float FPerlinNoiseGenerator2D::GetNoise(float _X, float _Y)
 {
 	// The noise value for that coordinates after adding all octaves together
 	float NoiseValue = 0.0f;
@@ -80,11 +91,11 @@ float FPerlinNoiseGenerator2D::InterpolatedNoise(float X, float Y)
 
 
 	// "Draw the graph" around the given x coordinate using interpolation
-	float MinYInterp = (this ->* (InterpMethod3))(MinY[0], MinY[1], FractionalX);
-	float MaxYInterp = (this ->* (InterpMethod3))(MaxY[0], MaxY[1], FractionalX);
+	float MinYInterp = (Interpolation ->* (InterpMethod3))(MinY[0], MinY[1], FractionalX);
+	float MaxYInterp = (Interpolation ->* (InterpMethod3))(MaxY[0], MaxY[1], FractionalX);
 
 	// Interpolate between the two values based on the position on the y
-	return (this ->* (InterpMethod3))(MinYInterp, MaxYInterp, FractionalY);
+	return (Interpolation ->* (InterpMethod3))(MinYInterp, MaxYInterp, FractionalY);
 }
 
 float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
@@ -154,11 +165,11 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 	// "Draw the graph" around the given x coordinate using cubic interpolation
 	for (int32 Y = 0; Y < 4; Y++)
 	{
-		XValues[Y] = (this->* (InterpMethod5))(SurroundingPoints[Y][0], SurroundingPoints[Y][1], SurroundingPoints[Y][2], SurroundingPoints[Y][3], FractionalX);
+		XValues[Y] = (Interpolation->* (InterpMethod5))(SurroundingPoints[Y][0], SurroundingPoints[Y][1], SurroundingPoints[Y][2], SurroundingPoints[Y][3], FractionalX);
 	}
 
 	// Interpolate between all values based on the position on the y
-	return (this->* (InterpMethod5))(XValues[0], XValues[1], XValues[2], XValues[3], FractionalY);
+	return (Interpolation->* (InterpMethod5))(XValues[0], XValues[1], XValues[2], XValues[3], FractionalY);
 }
 
 float FPerlinNoiseGenerator2D::SmoothNoise(float X, float Y)
@@ -175,30 +186,6 @@ float FPerlinNoiseGenerator2D::SmoothNoise(float X, float Y)
 
 	// Add it all together to get the smoothed height
 	return Corners + Sides + Center;
-}
-
-float FPerlinNoiseGenerator2D::CubicInterp(float V0, float V1, float V2, float V3, float A)
-{
-	float P = (V3 - V2) - (V0 - V1);
-	float Q = (V0 - V1) - P;
-	float R = V2 - V0;
-	float S = V1;
-	return P * FMath::Pow(A, 3) + Q * FMath::Pow(A, 2) + R * A + S;
-}
-
-float FPerlinNoiseGenerator2D::CosineInterp(float V1, float V2, float A)
-{
-	float Ft = A * 3.1415927;
-	float F = (1.0f - FMath::Cos(Ft)) * 0.5f;
-
-	return V1 * (1.0f - F) + (V2 * F);
-}
-
-
-
-float FPerlinNoiseGenerator2D::Lerp(float V1, float V2, float A)
-{
-	return V1*(1 - A) + V2*A;
 }
 
 float FPerlinNoiseGenerator2D::RawNoise3D(int32 _X, int32 _Y, int32 _Z)
@@ -272,15 +259,15 @@ void FPerlinNoiseGenerator2D::ChangeSettings(FPerlinNoiseSettings* Settings)
 	switch (NoiseSettings.InterpMethod)
 	{
 	case EInterpMethod::Lerp:
-		InterpMethod3 = &FPerlinNoiseGenerator2D::Lerp;
+		InterpMethod3 = &FInterpolation::Linear;
 		InterpHub = &FPerlinNoiseGenerator2D::InterpolatedNoise;
 		break;
 	case EInterpMethod::Cosine:
-		InterpMethod3 = &FPerlinNoiseGenerator2D::CosineInterp;
+		InterpMethod3 = &FInterpolation::Cosine;
 		InterpHub = &FPerlinNoiseGenerator2D::InterpolatedNoise;
 		break;
 	case EInterpMethod::Cubic:
-		InterpMethod5 = &FPerlinNoiseGenerator2D::CubicInterp;
+		InterpMethod5 = &FInterpolation::Cubic;
 		InterpHub = &FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise;
 		break;
 	default:

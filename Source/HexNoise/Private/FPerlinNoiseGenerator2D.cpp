@@ -13,7 +13,7 @@ FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D(FPerlinNoiseSettings* Settings)
 	ChangeSettings(Settings);
 }
 
-float FPerlinNoiseGenerator2D::GetNoise(double X, double Y)
+double FPerlinNoiseGenerator2D::GetNoise(double X, double Y)
 {
 	// The noise value for that coordinates after adding all octaves together
 	double NoiseValue = 0.0f;

@@ -2,7 +2,7 @@
 #include "HexNoisePrivatePCH.h"
 #include "FModule.h"
 
-
+using namespace HexNoise;
 
 FModule::FModule(int32 NumSubModules)
 {

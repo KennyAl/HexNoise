@@ -22,4 +22,4 @@ void FHexNoiseModule::ShutdownModule()
 IMPLEMENT_MODULE(FHexNoiseModule, HexNoise)
 
 // Custom log category for this plugin
-DEFINE_LOG_CATEGORY(HexNoise);
+//DEFINE_LOG_CATEGORY(HexNoise2);

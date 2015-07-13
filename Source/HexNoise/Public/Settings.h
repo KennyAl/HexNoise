@@ -2,6 +2,7 @@
 
 #include "Settings.generated.h"
 
+
 /** The method that gets applied to interpolate between the generated points */
 UENUM(BlueprintType)
 enum class EInterpMethod : uint8
@@ -22,7 +23,7 @@ struct FPerlinNoiseSettings
 	GENERATED_USTRUCT_BODY()
 
 	/** How many octaves (individual noise functions) are added on top of another to get the final result, default is 1 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PerlinNosie")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PerlinNosie")
 	int32 Oktaves = 1;
 
 	/** The amplitude of the first octave, default is 1.0f */

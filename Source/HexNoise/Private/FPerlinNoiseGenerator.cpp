@@ -3,6 +3,8 @@
 #include "FPerlinNoiseGenerator.h"
 #include <assert.h>
 
+using namespace HexNoise;
+
 FPerlinNoiseGenerator::FPerlinNoiseGenerator()
 {
 	Interpolation = new FInterpolation;

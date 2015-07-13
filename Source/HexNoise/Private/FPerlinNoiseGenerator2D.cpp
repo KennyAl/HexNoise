@@ -3,6 +3,9 @@
 #include "HexNoisePrivatePCH.h"
 #include "FPerlinNoiseGenerator2D.h"
 
+
+using namespace HexNoise;
+
 FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D()
 	: FModule(GetNumSubModules())
 {
@@ -185,7 +188,7 @@ void FPerlinNoiseGenerator2D::ChangeSettings(FPerlinNoiseSettings* Settings)
 		break;
 	default:
 		// Notify the user at this point, since we never should end up here
-		UE_LOG(HexNoise, Warning, TEXT("No combination of functions, which would support this interpolation were found !"));
+	//	UE_LOG(HexNoise, Warning, TEXT("No combination of functions, which would support this interpolation were found !"));
 		break;
 	}
 }

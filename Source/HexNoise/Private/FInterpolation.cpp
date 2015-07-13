@@ -1,6 +1,7 @@
 #include "HexNoisePrivatePCH.h"
 #include "FInterpolation.h"
 
+using namespace HexNoise;
 
 double FInterpolation::Cubic(double V0, double V1, double V2, double V3, double A)
 {

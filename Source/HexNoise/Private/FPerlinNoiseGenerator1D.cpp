@@ -13,10 +13,10 @@ FPerlinNoiseGenerator1D::FPerlinNoiseGenerator1D()
 	ChangeSettings(&NoiseSettings);
 }
 
-float FPerlinNoiseGenerator1D::GetNoise(float X)
+double FPerlinNoiseGenerator1D::GetNoise(double X)
 {
 	// The noise value for that coordinates after adding all octaves together
-	float NoiseValue = 0.0f;
+	double NoiseValue = 0.0f;
 
 	float Frequency = NoiseSettings.InitialFrequency;
 
@@ -63,17 +63,17 @@ void FPerlinNoiseGenerator1D::ChangeSettings(FPerlinNoiseSettings* Settings)
 	}
 }
 
-float FPerlinNoiseGenerator1D::RawNoise(int32 X)
+double FPerlinNoiseGenerator1D::RawNoise(int32 X)
 {
 	X = (X << 13) ^ X;
 	return (1.0 - ((X * (X * X * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
 }
 
-float FPerlinNoiseGenerator1D::InterpolatedNoise(float X)
+double FPerlinNoiseGenerator1D::InterpolatedNoise(double X)
 {
 	// Single out the fraction of the coordinate
 	int32 IntegerX = X;
-	float FractionalX = X - IntegerX;
+	double FractionalX = X - IntegerX;
 
 	// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
 	if (NoiseSettings.bSmooth == false || NoiseSettings.SmoothingFactor < 0.001f)
@@ -89,11 +89,11 @@ float FPerlinNoiseGenerator1D::InterpolatedNoise(float X)
 	}
 }
 
-float FPerlinNoiseGenerator1D::AdvancedInterpolatedNoise(float X)
+double FPerlinNoiseGenerator1D::AdvancedInterpolatedNoise(double X)
 {
 	// Single out the fraction of the coordinate
 	int32 IntegerX = X;
-	float FractionalX = X - IntegerX;
+	double FractionalX = X - IntegerX;
 
 	// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
 	if (NoiseSettings.bSmooth == false || NoiseSettings.SmoothingFactor < 0.001f)
@@ -111,7 +111,7 @@ float FPerlinNoiseGenerator1D::AdvancedInterpolatedNoise(float X)
 	}
 }
 
-float FPerlinNoiseGenerator1D::SmoothNoise(float X)
+double FPerlinNoiseGenerator1D::SmoothNoise(double X)
 {
 	return RawNoise(X) / 2 + RawNoise(X - 1) / 4 + RawNoise(X + 1) / 4;
 }

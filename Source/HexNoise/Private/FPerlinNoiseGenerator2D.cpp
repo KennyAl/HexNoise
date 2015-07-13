@@ -3,15 +3,20 @@
 #include "HexNoisePrivatePCH.h"
 #include "FPerlinNoiseGenerator2D.h"
 
+FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D()
+{
+	ChangeSettings(&NoiseSettings);
+}
+
 FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D(FPerlinNoiseSettings* Settings)
 {
 	ChangeSettings(Settings);
 }
 
-float FPerlinNoiseGenerator2D::GetNoise(float _X, float _Y)
+float FPerlinNoiseGenerator2D::GetNoise(double X, double Y)
 {
 	// The noise value for that coordinates after adding all octaves together
-	float NoiseValue = 0.0f;
+	double NoiseValue = 0.0f;
 
 	float Frequency = NoiseSettings.InitialFrequency;
 
@@ -19,7 +24,7 @@ float FPerlinNoiseGenerator2D::GetNoise(float _X, float _Y)
 
 	for (int32 Oktave = 0; Oktave < NoiseSettings.Oktaves; Oktave++)
 	{
-		NoiseValue += (this ->* (InterpHub))(_X * Frequency, _Y * Frequency) * Amplitude;
+		NoiseValue += (this ->* (InterpHub))(X * Frequency, Y * Frequency) * Amplitude;
 
 		// For every new octave modify the frequency and amplitude 
 
@@ -31,11 +36,11 @@ float FPerlinNoiseGenerator2D::GetNoise(float _X, float _Y)
 	return NoiseValue;
 }
 
-float FPerlinNoiseGenerator2D::RawNoise(int32 _X, int32 _Y)
+double FPerlinNoiseGenerator2D::RawNoise(int32 X, int32 Y)
 {
 	// TODO: Add support for a seed that gets add to the modifier in some way
 	// Doing some semi random operations on the modifier
-	int32 Modifier = _X + _Y * 57;
+	int32 Modifier = X + Y * 57;
 	Modifier = (Modifier << 13) ^ Modifier;
 
 	// TODO: Maybe use the in engine random number generator and some extra code to switch those hard coded prime numbers 
@@ -44,20 +49,20 @@ float FPerlinNoiseGenerator2D::RawNoise(int32 _X, int32 _Y)
 	return (1.0f - (((Modifier* (Modifier * Modifier * 15731 + 789221) + 1376312589)) & 0x7fffffff) / 1073741824.0);
 }
 
-float FPerlinNoiseGenerator2D::InterpolatedNoise(float X, float Y)
+double FPerlinNoiseGenerator2D::InterpolatedNoise(double X, double Y)
 {
 	// Single out the fractions of the coordinates
 	int32 IntegerX = X;
-	float FractionalX = X - IntegerX;
+	double FractionalX = X - IntegerX;
 
 	int32 IntegerY = Y;
-	float FractionalY = Y - IntegerY;
+	double FractionalY = Y - IntegerY;
 
 	// X-values for y
-	float MinY[2];
+	double MinY[2];
 
 	// X-values for y + 1
-	float MaxY[2];
+	double MaxY[2];
 
 	// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
 	if (NoiseSettings.bSmooth == false || NoiseSettings.SmoothingFactor < 0.001f)
@@ -80,24 +85,24 @@ float FPerlinNoiseGenerator2D::InterpolatedNoise(float X, float Y)
 
 
 	// "Draw the graph" around the given x coordinate using interpolation
-	float MinYInterp = (Interpolation ->* (InterpMethod3))(MinY[0], MinY[1], FractionalX);
-	float MaxYInterp = (Interpolation ->* (InterpMethod3))(MaxY[0], MaxY[1], FractionalX);
+	double MinYInterp = (Interpolation ->* (InterpMethod3))(MinY[0], MinY[1], FractionalX);
+	double MaxYInterp = (Interpolation ->* (InterpMethod3))(MaxY[0], MaxY[1], FractionalX);
 
 	// Interpolate between the two values based on the position on the y
 	return (Interpolation ->* (InterpMethod3))(MinYInterp, MaxYInterp, FractionalY);
 }
 
-float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
+double FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(double X, double Y)
 {
 	// Single out the fractions of the coordinates
 	int32 IntegerX = X;
-	float FractionalX = X - IntegerX;
+	double FractionalX = X - IntegerX;
 
 	int32 IntegerY = Y;
-	float FractionalY = Y - IntegerY;
+	double FractionalY = Y - IntegerY;
 
 	// X-values for y + 2 
-	float SurroundingPoints[4][4];
+	double SurroundingPoints[4][4];
 
 	// Generate the raw (or smoothed data for all relevant points
 	// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
@@ -125,7 +130,7 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 	}
 
 	// Stores the interpolated data for all x values
-	float XValues[4];
+	double XValues[4];
 
 	// "Draw the graph" around the given x coordinate using cubic interpolation
 	for (int32 Y = 0; Y < 4; Y++)
@@ -137,17 +142,17 @@ float FPerlinNoiseGenerator2D::AdvancedInterpolatedNoise(float X, float Y)
 	return (Interpolation->* (InterpMethod5))(XValues[0], XValues[1], XValues[2], XValues[3], FractionalY);
 }
 
-float FPerlinNoiseGenerator2D::SmoothNoise(float X, float Y)
+double FPerlinNoiseGenerator2D::SmoothNoise(double X, double Y)
 {
 	// Get the height values of the corners, they are considered less important for the smoothed height
-	float Corners = (RawNoise(X - 1, Y - 1) + RawNoise(X + 1, Y - 1) +
+	double Corners = (RawNoise(X - 1, Y - 1) + RawNoise(X + 1, Y - 1) +
 		RawNoise(X - 1, Y + 1) + RawNoise(X + 1, Y + 1)) / 16.0f;
 
 	// Get the height values of the corners, they influence the end result twice as much as the corners
-	float Sides = (RawNoise(X - 1, Y) + RawNoise(X + 1, Y) + RawNoise(X, Y - 1) + RawNoise(X, Y + 1)) / 8.0f;
+	double Sides = (RawNoise(X - 1, Y) + RawNoise(X + 1, Y) + RawNoise(X, Y - 1) + RawNoise(X, Y + 1)) / 8.0f;
 
 	// The height of the center is most important
-	float Center = RawNoise(X, Y) / 4.0f;
+	double Center = RawNoise(X, Y) / 4.0f;
 
 	// Add it all together to get the smoothed height
 	return Corners + Sides + Center;

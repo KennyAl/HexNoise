@@ -29,10 +29,10 @@ protected:
 	FPerlinNoiseSettings NoiseSettings;
 
 	/** Pointer to the interpolation method the user has chosen (used for methods that require only three params) */
-	float (FInterpolation::*InterpMethod3)(float, float, float);
+	double (FInterpolation::*InterpMethod3)(double, double, double);
 
 	/** Pointer to the interpolation method the user has chosen (used for methods that require five params) */
-	float (FInterpolation::*InterpMethod5)(float, float, float, float, float);
+	double (FInterpolation::*InterpMethod5)(double, double, double, double, double);
 
 	/** Used for dereferencing the function pointers to the interpolation methods */
 	FInterpolation* Interpolation;

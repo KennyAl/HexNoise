@@ -9,7 +9,7 @@ class HEXNOISE_API FPerlinNoiseGenerator2D : public FPerlinNoiseGenerator
 public:
 
 	/** Default constructor, generator uses default settings */
-	FPerlinNoiseGenerator2D(){};
+	FPerlinNoiseGenerator2D();
 
 	/** Constructor
 	* @param Settings	Pointer to the settings for the generator
@@ -21,7 +21,7 @@ public:
 	* @param Y	The Y coordinate
 	* @returns	The noise value
 	*/
-	float GetNoise(float _X, float _Y);
+	double GetNoise(double X, double Y);
 
 	/** Changes the settings used by the generator
 	* @param Settings	Pointer to the new settings
@@ -36,32 +36,32 @@ private:
 	* @param Y	The Y coordinate
 	* @returns	The noise value
 	*/
-	float RawNoise(int32 _X, int32 _Y);
+	double RawNoise(int32 X, int32 Y);
 
 	/** Generates interpolated and (if desired) smoothed noise for a pair of coordinates, used for interpolations requiring three params;
 	* @param X	The X coordinate
 	* @param Y	The Y coordinate
 	* @returns	The noise value
 	*/
-	float InterpolatedNoise(float X, float Y);
+	double InterpolatedNoise(double X, double Y);
 
 	/** Generates interpolated and (if desired) smoothed noise for a pair of coordinates, used for interpolations requiring five params;
 	* @param X	The X coordinate
 	* @param Y	The Y coordinate
 	* @returns	The noise value
 	*/
-	float AdvancedInterpolatedNoise(float _X, float _Y);
+	double AdvancedInterpolatedNoise(double X, double Y);
 
 	/** Generates smoothed noise for a pair of coordinates
 	* @param X	The X coordinate
 	* @param Y	The Y coordinate
 	* @returns	The noise value
 	*/
-	float SmoothNoise(float X, float Y);
+	double SmoothNoise(double X, double Y);
 
 	/** Pointer to the function fitting to the selected interpolation method
 	* e.g when selected "Lerp" this will point to a function which only calculates data for V1 and V2
 	* but when "Cubic" is selected this will point to a function which also calculates data for V0 and V3
 	*/
-	float (FPerlinNoiseGenerator2D::*InterpHub)(float, float);
+	double (FPerlinNoiseGenerator2D::*InterpHub)(double, double);
 };

@@ -14,7 +14,7 @@ public:
 	* @param A		The alpha value
 	* @returns		The interpolated value
 	*/
-	float Cubic(float V0, float V1, float V2, float V3, float A);
+	double Cubic(double V0, double V1, double V2, double V3, double A);
 
 	/** Performs a cosine interpolation
 	* @param V1		The point a
@@ -22,7 +22,7 @@ public:
 	* @param A		The alpha value
 	* @returns		The interpolated value
 	*/
-	float Cosine(float V1, float V2, float A);
+	double Cosine(double V1, double V2, double A);
 
 
 	/** Performs a linear interpolation
@@ -31,5 +31,5 @@ public:
 	* @param A		The alpha
 	* @returns		The interpolated value
 	*/
-	float Linear(float V1, float V2, float A);
+	double Linear(double V1, double V2, double A);
 };

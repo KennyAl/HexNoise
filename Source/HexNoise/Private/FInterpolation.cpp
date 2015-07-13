@@ -2,24 +2,24 @@
 #include "FInterpolation.h"
 
 
-float FInterpolation::Cubic(float V0, float V1, float V2, float V3, float A)
+double FInterpolation::Cubic(double V0, double V1, double V2, double V3, double A)
 {
-	float P = (V3 - V2) - (V0 - V1);
-	float Q = (V0 - V1) - P;
-	float R = V2 - V0;
-	float S = V1;
+	double P = (V3 - V2) - (V0 - V1);
+	double Q = (V0 - V1) - P;
+	double R = V2 - V0;
+	double S = V1;
 	return P * FMath::Pow(A, 3) + Q * FMath::Pow(A, 2) + R * A + S;
 }
 
-float FInterpolation::Cosine(float V1, float V2, float A)
+double FInterpolation::Cosine(double V1, double V2, double A)
 {
-	float Ft = A * 3.1415927;
-	float F = (1.0f - FMath::Cos(Ft)) * 0.5f;
+	double Ft = A * 3.1415927;
+	double F = (1.0f - FMath::Cos(Ft)) * 0.5f;
 
 	return V1 * (1.0f - F) + (V2 * F);
 }
 
-float FInterpolation::Linear(float V1, float V2, float A)
+double FInterpolation::Linear(double V1, double V2, double A)
 {
 	return V1*(1 - A) + V2*A;
 }

@@ -1,10 +1,11 @@
 
 #pragma once
 
+#include "FModule.h"
 #include "FPerlinNoiseGenerator.h"
 
 /** Generates 1d perlin noise */
-class HEXNOISE_API FPerlinNoiseGenerator1D : public FPerlinNoiseGenerator
+class HEXNOISE_API FPerlinNoiseGenerator1D : public FPerlinNoiseGenerator, public FModule
 {
 public:
 
@@ -20,12 +21,17 @@ public:
 	* @param X	The X coordinate
 	* @returns	The noise value
 	*/
-	double GetNoise(double X);
+	double GetNoise(double X, double Y = 0.0, double Z = 0.0) override;
 
 	/** Changes the settings used by the generator
 	* @param Settings	Pointer to the new settings
 	*/
 	virtual void ChangeSettings(FPerlinNoiseSettings* Settings) override;
+
+	virtual int32 GetNumSubModules() const override
+	{
+		return 0;
+	}
 
 private:
 

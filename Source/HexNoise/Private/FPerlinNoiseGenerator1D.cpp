@@ -4,16 +4,18 @@
 #include "FPerlinNoiseGenerator1D.h"
 
 FPerlinNoiseGenerator1D::FPerlinNoiseGenerator1D(FPerlinNoiseSettings* Settings)
+	: FModule(GetNumSubModules())
 {
 	ChangeSettings(Settings);
 }
 
 FPerlinNoiseGenerator1D::FPerlinNoiseGenerator1D()
+	: FModule(GetNumSubModules())
 {
 	ChangeSettings(&NoiseSettings);
 }
 
-double FPerlinNoiseGenerator1D::GetNoise(double X)
+double FPerlinNoiseGenerator1D::GetNoise(double X, double Y, double Z)
 {
 	// The noise value for that coordinates after adding all octaves together
 	double NoiseValue = 0.0f;

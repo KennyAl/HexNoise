@@ -4,19 +4,21 @@
 #include "FPerlinNoiseGenerator2D.h"
 
 FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D()
+	: FModule(GetNumSubModules())
 {
 	ChangeSettings(&NoiseSettings);
 }
 
 FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D(FPerlinNoiseSettings* Settings)
+	: FModule(GetNumSubModules())
 {
 	ChangeSettings(Settings);
 }
 
-double FPerlinNoiseGenerator2D::GetNoise(double X, double Y)
+double FPerlinNoiseGenerator2D::GetNoise(double X, double Y, double Z)
 {
 	// The noise value for that coordinates after adding all octaves together
-	double NoiseValue = 0.0f;
+	double NoiseValue = 0.0;
 
 	float Frequency = NoiseSettings.InitialFrequency;
 
@@ -33,8 +35,10 @@ double FPerlinNoiseGenerator2D::GetNoise(double X, double Y)
 		Amplitude *= NoiseSettings.Persistence;
 	}
 
+	assert(!FMath::IsNearlyEqual(Y, 0.0));
 	return NoiseValue;
 }
+
 
 double FPerlinNoiseGenerator2D::RawNoise(int32 X, int32 Y)
 {

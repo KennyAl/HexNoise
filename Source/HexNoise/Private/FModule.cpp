@@ -10,7 +10,7 @@ FModule::FModule(int32 NumSubModules)
 	if (NumSubModules > 0)
 	{
 		SubModules = new const FModule*[NumSubModules];
-		SubModules = { nullptr };
+		*SubModules = { nullptr };
 	}
 	else
 	{
@@ -24,12 +24,12 @@ FModule::~FModule()
 	delete[] SubModules;
 }
 
-void FModule::SetSubModule(FModule* NewSubModule, int32 Index)
+void FModule::SetSubModule(FModule& NewSubModule, int32 Index)
 {
 
 #ifdef CHECKS_ENALBED
 	assert(NewSubModule != nullptr || Index > 0 || Index <= GetNumSubModules());
 #endif 
 
-	SubModules[Index] = NewSubModule;
+	SubModules[Index] = &NewSubModule;
 }

@@ -23,7 +23,7 @@ namespace HexNoise
 		* This is because users are allowed to use a module to combine (for example add) the outputs of a 3D
 		* and a 2D generator module. To allow this compatibility all modules have to have the same function implemented.
 		*/
-		virtual double GetNoise(double X, double Y = 0.0, double Z = 0.0) = 0;
+		virtual double GetNoise(double X, double Y = 0.0, double Z = 0.0) const = 0;
 
 		/** Returns the number of sub modules this module supports */
 		virtual int32 GetNumSubModules() const = 0;
@@ -42,9 +42,9 @@ namespace HexNoise
 		* @param NewSubModule	Pointer to the new submodule
 		* @param Index			The
 		*/
-		void SetSubModule(FModule* NewSubModule, int32 Index);
+		void SetSubModule(FModule& NewSubModule, int32 Index);
 
-	private:
+	protected:
 
 		/** Pointer to an array of pointers to submodules */
 		const FModule** SubModules;

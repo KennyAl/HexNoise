@@ -17,7 +17,7 @@ namespace HexNoise
 		* @param A		The alpha value
 		* @returns		The interpolated value
 		*/
-		double Cubic(double V0, double V1, double V2, double V3, double A);
+		static double Cubic(double V0, double V1, double V2, double V3, double A);
 
 		/** Performs a cosine interpolation
 		* @param V1		The point a
@@ -25,7 +25,7 @@ namespace HexNoise
 		* @param A		The alpha value
 		* @returns		The interpolated value
 		*/
-		double Cosine(double V1, double V2, double A);
+		static double Cosine(double V1, double V2, double A);
 
 
 		/** Performs a linear interpolation
@@ -34,7 +34,7 @@ namespace HexNoise
 		* @param A		The alpha
 		* @returns		The interpolated value
 		*/
-		double Linear(double V1, double V2, double A);
+		static double Linear(double V1, double V2, double A);
 	};
 
 }

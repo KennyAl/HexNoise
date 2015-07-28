@@ -60,4 +60,10 @@ struct FPerlinNoiseSettings
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PerlinNosie")
 	float SmoothingFactor = 0.75f;
+
+	/** The seed that is used to generate noise, the same seed (in combination with the same settings) will always generate the same noise value
+	* Default is 0;
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PerlinNosie")
+	int32 Seed = 0;
 };

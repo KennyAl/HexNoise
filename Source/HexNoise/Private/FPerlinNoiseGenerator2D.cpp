@@ -19,24 +19,24 @@ FPerlinNoiseGenerator2D::FPerlinNoiseGenerator2D(FPerlinNoiseSettings* Settings)
 
 double FPerlinNoiseGenerator2D::GetNoise(double X, double Y, double Z) const
 {
-		// The noise value for that coordinates after adding all octaves together
-		double NoiseValue = 0.0;
+	// The noise value for that coordinates after adding all octaves together
+	double NoiseValue = 0.0;
 	
-		float Frequency = NoiseSettings.InitialFrequency;
+	float Frequency = NoiseSettings.InitialFrequency;
 	
-		float Amplitude = NoiseSettings.InitialAmplitude;
+	float Amplitude = NoiseSettings.InitialAmplitude;
 
-		for (int32 Oktave = 0; Oktave < NoiseSettings.Oktaves; Oktave++)
-		{
-			NoiseValue += FNoise2D::InterpolatedNoise(X * Frequency, Y * Frequency, NoiseSettings.InterpMethod, 
-				NoiseSettings.bSmooth, NoiseSettings.SmoothingFactor, NoiseSettings.Seed) * Amplitude;
+	for (int32 Oktave = 0; Oktave < NoiseSettings.Oktaves; Oktave++)
+	{
+		NoiseValue += FNoise2D::InterpolatedNoise(X * Frequency, Y * Frequency, NoiseSettings.InterpMethod, 
+			NoiseSettings.bSmooth, NoiseSettings.SmoothingFactor, NoiseSettings.Seed) * Amplitude;
 	
-			// For every new octave modify the frequency and amplitude 
+		// For every new octave modify the frequency and amplitude 
 	
-			Frequency *= NoiseSettings.FrequencyMultiplier;
+		Frequency *= NoiseSettings.FrequencyMultiplier;
 	
-			Amplitude *= NoiseSettings.Persistence;
-		}
+		Amplitude *= NoiseSettings.Persistence;
+	}
 	
-		return NoiseValue;
+	return NoiseValue;
 }

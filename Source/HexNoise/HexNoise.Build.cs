@@ -9,8 +9,7 @@ public class HexNoise : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"HexNoise/Public"
-				
+				"HexNoise/Public",
 				// ... add public include paths required here ...
 			}
 			);
@@ -19,7 +18,6 @@ public class HexNoise : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"HexNoise/Private",
-				
 				// ... add other private include paths required here ...
 			}
 			);

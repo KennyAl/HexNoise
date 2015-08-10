@@ -34,5 +34,15 @@ namespace HexNoise
 		static double InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod = DefaultInterpMethod,
 			bool bSmooth = DefaultSmooth, float SmoothFaktor = DefaultSmoothFaktor, int32 Seed = DefaultSeed);
 	};
+
+	class HEXNOISE_API FNoise3D
+	{
+
+	public:
+
+		static double RawNoise(int32 X, int32 Y, int32 Z, int32 Seed = DefaultSeed);
+
+		static double InterpolatedNoise(double X, double Y, double Z, EInterpMethod InterpMethod = DefaultInterpMethod, int32 Seed = DefaultSeed);
+	};
 }
 

@@ -28,6 +28,8 @@ public class HexNoise : ModuleRules
 			{
 				"Core",
 				"CoreUObject",
+				"Engine",
+				"RHI"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

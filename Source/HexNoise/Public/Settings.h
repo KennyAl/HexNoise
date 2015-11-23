@@ -51,16 +51,6 @@ struct FPerlinNoiseSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PerlinNosie")
 	EInterpMethod InterpMethod = EInterpMethod::Lerp;
 
-	/** Whether the generated noise should be smoothed or not, default is true */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PerlinNosie")
-	bool bSmooth = true;
-
-	/** The amount of smoothing that gets applied to the noise
-	* Range: 0 - 1, default is 0.75f;
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PerlinNosie")
-	float SmoothingFactor = 0.75f;
-
 	/** The seed that is used to generate noise, the same seed (in combination with the same settings) will always generate the same noise value
 	* Default is 0;
 	*/

@@ -28,7 +28,7 @@ double FPerlinNoiseGenerator1D::GetNoise(double X, double Y, double Z) const
 	for (int32 Oktave = 0; Oktave < NoiseSettings.Oktaves; Oktave++)
 	{
 		NoiseValue += FNoise1D::InterpolatedNoise(X * Frequency, NoiseSettings.InterpMethod,
-			NoiseSettings.bSmooth, NoiseSettings.SmoothingFactor, NoiseSettings.Seed) * Amplitude;
+			NoiseSettings.Seed) * Amplitude;
 
 		// For every new octave modify the frequency and amplitude 
 

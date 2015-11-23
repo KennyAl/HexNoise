@@ -16,12 +16,7 @@ double FNoise1D::RawNoise(int32 X, int32 Seed)
 	return (1.0 - ((X * (X * X * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
 }
 
-double FNoise1D::SmoothNoise(double X, int32 Seed)
-{
-	return RawNoise(X, Seed) / 2 + RawNoise(X - 1, Seed) / 4 + RawNoise(X + 1, Seed) / 4;
-}
-
-double FNoise1D::InterpolatedNoise(double X, EInterpMethod InterpMethod, bool bSmooth, float SmoothFaktor, int32 Seed)
+double FNoise1D::InterpolatedNoise(double X, EInterpMethod InterpMethod, int32 Seed)
 {
 	// Single out the fraction of the coordinate
 	int32 IntegerX = X;
@@ -31,52 +26,20 @@ double FNoise1D::InterpolatedNoise(double X, EInterpMethod InterpMethod, bool bS
 	{
 	case EInterpMethod::Lerp:
 	{
-		// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
-		if (bSmooth == false || SmoothFaktor < 0.001f)
-		{
-			return FInterpolation::Linear(RawNoise(X, Seed), RawNoise(X + 1, Seed), FractionalX);
-		}
-		else
-		{
-			return FInterpolation::Linear(
-				FInterpolation::Linear(SmoothNoise(X, Seed), RawNoise(X, Seed), SmoothFaktor),
-				FInterpolation::Linear(SmoothNoise(X + 1, Seed), RawNoise(X + 1, Seed), SmoothFaktor),
-				FractionalX);
-		}
+		// Generate the raw noise data
+		return FInterpolation::Linear(RawNoise(X, Seed), RawNoise(X + 1, Seed), FractionalX);
 	}
 		break;
 	case EInterpMethod::Cosine:
 	{
-		// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
-		if (bSmooth == false || SmoothFaktor < 0.001f)
-		{
-			return FInterpolation::Cosine(RawNoise(X, Seed), RawNoise(X + 1, Seed), FractionalX);
-		}
-		else
-		{
-			return FInterpolation::Cosine(
-				FInterpolation::Linear(SmoothNoise(X, Seed), RawNoise(X, Seed), SmoothFaktor),
-				FInterpolation::Linear(SmoothNoise(X + 1, Seed), RawNoise(X + 1, Seed), SmoothFaktor),
-				FractionalX);
-		}
+		// Generate the raw noise data
+		return FInterpolation::Cosine(RawNoise(X, Seed), RawNoise(X + 1, Seed), FractionalX);
 	}
 		break;
 	case EInterpMethod::Cubic:
 	{
-		// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
-		if (bSmooth == false || SmoothFaktor < 0.001f)
-		{
-			return FInterpolation::Cubic(RawNoise(X - 1, Seed), RawNoise(X, Seed), RawNoise(X + 1, Seed), RawNoise(X + 2, Seed), FractionalX);
-		}
-		else
-		{
-			return FInterpolation::Cubic(
-				FInterpolation::Linear(SmoothNoise(X - 1, Seed), RawNoise(X - 1, Seed), SmoothFaktor),
-				FInterpolation::Linear(SmoothNoise(X, Seed), RawNoise(X, Seed), SmoothFaktor),
-				FInterpolation::Linear(SmoothNoise(X + 1, Seed), RawNoise(X + 1, Seed), SmoothFaktor),
-				FInterpolation::Linear(SmoothNoise(X + 2, Seed), RawNoise(X + 2, Seed), SmoothFaktor),
-				FractionalX);
-		}
+		// Generate the raw noise data
+		return FInterpolation::Cubic(RawNoise(X - 1, Seed), RawNoise(X, Seed), RawNoise(X + 1, Seed), RawNoise(X + 2, Seed), FractionalX);
 	}
 		break;
 	default:
@@ -102,25 +65,8 @@ double FNoise2D::RawNoise(int32 X, int32 Y, int32 Seed)
 	return (1.0f - (((Modifier* (Modifier * Modifier * 15731 + 789221) + 1376312589)) & 0x7fffffff) / 1073741824.0);
 }
 
-double FNoise2D::SmoothNoise(double X, double Y, int32 Seed)
-{
-	// Get the height values of the corners, they are considered less important for the smoothed height
-	double Corners = (RawNoise(X - 1, Y - 1, Seed) + RawNoise(X + 1, Y - 1, Seed) +
-		RawNoise(X - 1, Y + 1, Seed) + RawNoise(X + 1, Y + 1, Seed)) / 16.0f;
-
-	// Get the height values of the corners, they influence the end result twice as much as the corners
-	double Sides = (RawNoise(X - 1, Y, Seed) + RawNoise(X + 1, Y, Seed) + RawNoise(X, Y - 1, Seed) + RawNoise(X, Y + 1, Seed)) / 8.0f;
-
-	// The height of the center is most important
-	double Center = RawNoise(X, Y, Seed) / 4.0f;
-
-	// Add it all together to get the smoothed height
-	return Corners + Sides + Center;
-}
-
-
 // #TODO: Rewrite this, since there is allot of room for improvements
-double FNoise2D::InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod, bool bSmooth, float SmoothFaktor, int32 Seed)
+double FNoise2D::InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod, int32 Seed)
 {
 	// Single out the fractions of the coordinates
 	int32 IntegerX = X;
@@ -139,25 +85,12 @@ double FNoise2D::InterpolatedNoise(double X, double Y, EInterpMethod InterpMetho
 		// X-values for y + 1
 		double MaxY[2];
 
-		// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
-		if (bSmooth == false || SmoothFaktor < 0.001f)
-		{
-			MinY[0] = RawNoise(IntegerX, IntegerY, Seed);
-			MinY[1] = RawNoise(IntegerX + 1, IntegerY, Seed);
+		// Generate the raw noise data
+		MinY[0] = RawNoise(IntegerX, IntegerY, Seed);
+		MinY[1] = RawNoise(IntegerX + 1, IntegerY, Seed);
 
-			MaxY[0] = RawNoise(IntegerX, IntegerY + 1, Seed);
-			MaxY[1] = RawNoise(IntegerX + 1, IntegerY + 1, Seed);
-		}
-		else
-		{
-			// Lerp between the smoothed and the raw noise based on the smoothing factor
-			MinY[0] = FInterpolation::Linear(SmoothNoise(IntegerX, IntegerY, Seed), RawNoise(IntegerX, IntegerY, Seed), SmoothFaktor);
-			MinY[1] = FInterpolation::Linear(SmoothNoise(IntegerX + 1, IntegerY, Seed), RawNoise(IntegerX + 1, IntegerY, Seed), SmoothFaktor);
-
-			MaxY[0] = FInterpolation::Linear(SmoothNoise(IntegerX, IntegerY + 1, Seed), RawNoise(IntegerX, IntegerY + 1, Seed), SmoothFaktor);
-			MaxY[1] = FInterpolation::Linear(SmoothNoise(IntegerX + 1, IntegerY + 1, Seed), RawNoise(IntegerX + 1, IntegerY + 1, Seed), SmoothFaktor);
-		}
-
+		MaxY[0] = RawNoise(IntegerX, IntegerY + 1, Seed);
+		MaxY[1] = RawNoise(IntegerX + 1, IntegerY + 1, Seed);
 
 		// "Draw the graph" around the given x coordinate using interpolation
 		double MinYInterp = FInterpolation::Linear(MinY[0], MinY[1], FractionalX);
@@ -175,25 +108,12 @@ double FNoise2D::InterpolatedNoise(double X, double Y, EInterpMethod InterpMetho
 		// X-values for y + 1
 		double MaxY[2];
 
-		// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
-		if (bSmooth == false || SmoothFaktor < 0.001f)
-		{
-			MinY[0] = RawNoise(IntegerX, IntegerY, Seed);
-			MinY[1] = RawNoise(IntegerX + 1, IntegerY, Seed);
+		// Generate the raw noise data
+		MinY[0] = RawNoise(IntegerX, IntegerY, Seed);
+		MinY[1] = RawNoise(IntegerX + 1, IntegerY, Seed);
 
-			MaxY[0] = RawNoise(IntegerX, IntegerY + 1, Seed);
-			MaxY[1] = RawNoise(IntegerX + 1, IntegerY + 1, Seed);
-		}
-		else
-		{
-			// Lerp between the smoothed and the raw noise based on the smoothing factor
-			MinY[0] = FInterpolation::Linear(SmoothNoise(IntegerX, IntegerY, Seed), RawNoise(IntegerX, IntegerY, Seed), SmoothFaktor);
-			MinY[1] = FInterpolation::Linear(SmoothNoise(IntegerX + 1, IntegerY, Seed), RawNoise(IntegerX + 1, IntegerY, Seed), SmoothFaktor);
-
-			MaxY[0] = FInterpolation::Linear(SmoothNoise(IntegerX, IntegerY + 1, Seed), RawNoise(IntegerX, IntegerY + 1, Seed), SmoothFaktor);
-			MaxY[1] = FInterpolation::Linear(SmoothNoise(IntegerX + 1, IntegerY + 1, Seed), RawNoise(IntegerX + 1, IntegerY + 1, Seed), SmoothFaktor);
-		}
-
+		MaxY[0] = RawNoise(IntegerX, IntegerY + 1, Seed);
+		MaxY[1] = RawNoise(IntegerX + 1, IntegerY + 1, Seed);
 
 		// "Draw the graph" around the given x coordinate using interpolation
 		double MinYInterp = FInterpolation::Cosine(MinY[0], MinY[1], FractionalX);
@@ -208,28 +128,12 @@ double FNoise2D::InterpolatedNoise(double X, double Y, EInterpMethod InterpMetho
 		// X-values for y + 2 
 		double SurroundingPoints[4][4];
 
-		// Generate the raw (or smoothed data for all relevant points
-		// If smooth noise is turned off or the smooth factor is close to 0: Skip the smoothing step
-		if (bSmooth == false || SmoothFaktor < 0.001f)
+		// Generate the raw noise data
+		for (int32 Y = 0; Y < 4; Y++)
 		{
-			for (int32 Y = 0; Y < 4; Y++)
+			for (int32 X = 0; X < 4; X++)
 			{
-				for (int32 X = 0; X < 4; X++)
-				{
-					SurroundingPoints[Y][X] = RawNoise(IntegerX + (X - 1), IntegerY + (Y - 1), Seed);
-				}
-			}
-		}
-		else
-		{
-			for (int32 Y = 0; Y < 4; Y++)
-			{
-				for (int32 X = 0; X < 4; X++)
-				{
-					// Lerp between the smoothed and the raw noise based on the smoothing factor
-					SurroundingPoints[Y][X] = FInterpolation::Linear(SmoothNoise(IntegerX + (X - 1), IntegerY + (Y - 1), Seed),
-						RawNoise(IntegerX + (X - 1), IntegerY + (Y - 1), Seed), SmoothFaktor);
-				}
+				SurroundingPoints[Y][X] = RawNoise(IntegerX + (X - 1), IntegerY + (Y - 1), Seed);
 			}
 		}
 
@@ -250,7 +154,6 @@ double FNoise2D::InterpolatedNoise(double X, double Y, EInterpMethod InterpMetho
 		break;
 	}
 }
-
 
 double FNoise3D::RawNoise(int32 X, int32 Y, int32 Z, int32 Seed)
 {

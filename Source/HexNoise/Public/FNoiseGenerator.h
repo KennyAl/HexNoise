@@ -16,10 +16,8 @@ namespace HexNoise
 
 		static double RawNoise(int32 X, int32 Seed = DefaultSeed);
 
-		static double SmoothNoise(double X, int32 Seed = DefaultSeed);
-
 		static double InterpolatedNoise(double X, EInterpMethod InterpMethod = DefaultInterpMethod,
-			bool bSmooth = DefaultSmooth, float SmoothFaktor = DefaultSmoothFaktor, int32 Seed = DefaultSeed);
+			int32 Seed = DefaultSeed);
 	};
 
 	class HEXNOISE_API FNoise2D
@@ -29,10 +27,8 @@ namespace HexNoise
 
 		static double RawNoise(int32 X, int32 Y, int32 Seed = DefaultSeed);
 
-		static double SmoothNoise(double X, double Y, int32 Seed = DefaultSeed);
-
 		static double InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod = DefaultInterpMethod,
-			bool bSmooth = DefaultSmooth, float SmoothFaktor = DefaultSmoothFaktor, int32 Seed = DefaultSeed);
+			int32 Seed = DefaultSeed);
 	};
 
 	class HEXNOISE_API FNoise3D

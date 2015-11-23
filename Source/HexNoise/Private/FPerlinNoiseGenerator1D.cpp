@@ -10,10 +10,10 @@ FPerlinNoiseGenerator1D::FPerlinNoiseGenerator1D()
 {
 }
 
-FPerlinNoiseGenerator1D::FPerlinNoiseGenerator1D(FPerlinNoiseSettings* Settings)
+FPerlinNoiseGenerator1D::FPerlinNoiseGenerator1D(FPerlinNoiseSettings& Settings)
 	: FModule(GetNumSubModules())
 {	
-	NoiseSettings = *Settings;
+	NoiseSettings = Settings;
 }
 
 double FPerlinNoiseGenerator1D::GetNoise(double X, double Y, double Z) const

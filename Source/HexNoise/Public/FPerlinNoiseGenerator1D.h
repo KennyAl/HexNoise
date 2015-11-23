@@ -18,7 +18,7 @@ namespace HexNoise
 		/** Constructor
 		* @param Settings	Pointer to the settings for the generator
 		*/
-		FPerlinNoiseGenerator1D(FPerlinNoiseSettings* Settings);
+		FPerlinNoiseGenerator1D(FPerlinNoiseSettings& Settings);
 
 		/** Generates perlin noise for a specified x coordinate
 		* @param X	The X coordinate

@@ -16,8 +16,7 @@ namespace HexNoise
 
 		static double RawNoise(int32 X, int32 Seed = DefaultSeed);
 
-		static double InterpolatedNoise(double X, EInterpMethod InterpMethod = DefaultInterpMethod,
-			int32 Seed = DefaultSeed);
+		static double InterpolatedNoise(double X, EInterpMethod InterpMethod = DefaultInterpMethod, int32 Seed = DefaultSeed);
 	};
 
 	class HEXNOISE_API FNoise2D
@@ -27,8 +26,7 @@ namespace HexNoise
 
 		static double RawNoise(int32 X, int32 Y, int32 Seed = DefaultSeed);
 
-		static double InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod = DefaultInterpMethod,
-			int32 Seed = DefaultSeed);
+		static double InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod = DefaultInterpMethod, int32 Seed = DefaultSeed);
 	};
 
 	class HEXNOISE_API FNoise3D

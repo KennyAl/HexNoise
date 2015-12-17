@@ -20,5 +20,9 @@ namespace HexNoise
 		}
 
 		double Value;
+
+	protected:
+
+		virtual void UpdateMinMaxValues() override;
 	};
 }

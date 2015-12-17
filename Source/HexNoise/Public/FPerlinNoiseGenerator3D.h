@@ -36,5 +36,10 @@ namespace HexNoise
 
 		/** Holds the settings */
 		FPerlinNoiseSettings NoiseSettings;
+
+	protected:
+
+		/** Updates the min/max values of this module */
+		virtual void UpdateMinMaxValues() override;
 	};
 }

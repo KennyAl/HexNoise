@@ -37,6 +37,14 @@ double FPerlinNoiseGenerator2D::GetNoise(double X, double Y, double Z) const
 	
 		Amplitude *= NoiseSettings.Persistence;
 	}
-	
+
 	return NoiseValue;
+}
+
+void FPerlinNoiseGenerator2D::UpdateMinMaxValues()
+{
+	// The below assumes that the persistence will never be greater than 1.0
+	// TODO: Make sure that a persistence above one will throw an error
+	MaxValue = NoiseSettings.InitialAmplitude;
+	MinValue = -NoiseSettings.InitialAmplitude;
 }

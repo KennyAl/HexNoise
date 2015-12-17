@@ -4,7 +4,7 @@
 	"Version": 1,
 	"VersionName": "0.5",
 	"CreatedBy": "",
-	"CreatedByURL": "",
+	"CreatedByURL": "http://hexnoise.jimdo.com/",
 	"Category": "Libraries",
 	"Description": "A user friendly noise generator for C++ and Blueprint",
 	"EnabledByDefault": true,

@@ -39,3 +39,11 @@ double FPerlinNoiseGenerator1D::GetNoise(double X, double Y, double Z) const
 	
 	return NoiseValue;
 }
+
+void FPerlinNoiseGenerator1D::UpdateMinMaxValues()
+{
+	// The below assumes that the persistence will never be greater than 1.0
+	// TODO: Make sure that a persistence above one will throw an error
+	MaxValue = NoiseSettings.InitialAmplitude;
+	MinValue = -NoiseSettings.InitialAmplitude;
+}

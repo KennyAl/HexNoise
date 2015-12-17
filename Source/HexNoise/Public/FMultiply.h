@@ -18,6 +18,11 @@ namespace HexNoise
 		{
 			return 2;
 		}
+
+	protected:
+
+		/** Updates the min/max values of this module */
+		virtual void UpdateMinMaxValues() override;
 	};
 }
 

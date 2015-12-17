@@ -28,9 +28,15 @@ namespace HexNoise
 		/** Returns the number of sub modules this module supports */
 		virtual int32 GetNumSubModules() const = 0;
 
+		/** Returns the min value that this module can output */
+		double GetMinValue();
+
+		/** Returns the max value that this module can output */
+		double GetMaxValue();
+
 		//
 		// End Interface
-		// 
+		//
 
 		/** Constructor */
 		FModule(int32 NumSubModules);
@@ -46,8 +52,23 @@ namespace HexNoise
 
 	protected:
 
+		/** Checks all submodules for their min/max values and updates the ones of the caller accordingly.
+		* Does not have to match the actual min/max values of the module, since it can modify the output 
+		* of its sub modules!
+		* Override this function, to implement logic module dependend logic and call FModule::UpdateMinMaxValues()
+		* first if the your module has one or more submodules.
+		* This gets called in GetMinValue() and GetMaxValue().
+		*/
+		virtual void UpdateMinMaxValues();
+
 		/** Pointer to an array of pointers to submodules */
-		const FModule** SubModules;
+		FModule** SubModules;
+
+		/** The min value that this module can output */
+		double MinValue;
+
+		/** The max value that this module can output */
+		double MaxValue;
 	};
 }
 

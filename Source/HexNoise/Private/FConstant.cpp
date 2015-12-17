@@ -13,5 +13,11 @@ FConstant::FConstant()
 
 double FConstant::GetNoise(double X, double Y, double Z) const
 {
-	return SubModules[0]->GetNoise(X, Y, Z) - SubModules[1]->GetNoise(X, Y, Z);
+	return Value;
+}
+
+void FConstant::UpdateMinMaxValues()
+{
+	MinValue = Value;
+	MaxValue = Value;
 }

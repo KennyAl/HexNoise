@@ -6,275 +6,226 @@
 using namespace HexNoise;
 
 
-double FNoise1D::RawNoise(int32 X, int32 Seed)
+double FNoise1D::RawNoise(int32 x, int32 seed)
 {
-	// Make sure that we never encounter any 0 coordinates since the outcome of all following operations would be 0
-	X = (X == 0 ? X - 1 : X);
-
-	X = X * 23 + Seed * 17;
-	X = (X << 13) ^ X;
-	return (1.0 - ((X * (X * X * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
+	x = x * 23 + seed * 17;
+	x = (x << 13) ^ x;
+	return (1.0 - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
 }
 
-double FNoise1D::InterpolatedNoise(double X, EInterpMethod InterpMethod, int32 Seed)
+double FNoise1D::InterpolatedNoise(double x, EInterpMethod interpMethod, int32 seed)
 {
 	// Single out the fraction of the coordinate
-	int32 IntegerX = X;
-	double FractionalX = X - IntegerX;
+	int32 integerX = x;
+	double fractionalX = x - integerX;
 
-	switch (InterpMethod)
-	{
-	case EInterpMethod::Lerp:
-	{
-		// Generate the raw noise data
-		return FInterpolation::Linear(RawNoise(X, Seed), RawNoise(X + 1, Seed), FractionalX);
-	}
-		break;
-	case EInterpMethod::Cosine:
-	{
-		// Generate the raw noise data
-		return FInterpolation::Cosine(RawNoise(X, Seed), RawNoise(X + 1, Seed), FractionalX);
-	}
-		break;
-	case EInterpMethod::Cubic:
-	{
-		// Generate the raw noise data
-		return FInterpolation::Cubic(RawNoise(X - 1, Seed), RawNoise(X, Seed), RawNoise(X + 1, Seed), RawNoise(X + 2, Seed), FractionalX);
-	}
-		break;
-	default:
-		return 0.0;
-		break;
-	}
+	// Generate the raw noise data
+	if(interpMethod == EInterpMethod::Lerp)
+		return FInterpolation::Linear(RawNoise(x, seed), RawNoise(x + 1, seed), fractionalX);
+	else if(interpMethod == EInterpMethod::Cosine)
+		return FInterpolation::Cosine(RawNoise(x, seed), RawNoise(x + 1, seed), fractionalX);
+	else
+		return FInterpolation::Cubic(RawNoise(x - 1, seed), RawNoise(x, seed), RawNoise(x + 1, seed), RawNoise(x + 2, seed), fractionalX);
 }
 
-double FNoise2D::RawNoise(int32 X, int32 Y, int32 Seed)
+double FNoise2D::RawNoise(int32 x, int32 y, int32 seed)
 {
-
-	// Make sure that we never encounter any 0 coordinates since the outcome of all following operations would be 0
-	X = (X == 0 ? X - 1 : X);
-	Y = (Y == 0 ? Y - 1 : Y);
-
 	// Doing some semi random operations on the modifier
-	int32 Modifier = X * 23 + Y * 57 + Seed * 17;
-	Modifier = (Modifier << 13) ^ Modifier;
+	int32 modifier = x * 23 + y * 57 + seed * 17;
+	modifier = (modifier << 13) ^ modifier;
 
 	// TODO: Maybe use the in engine random number generator and some extra code to switch those hard coded prime numbers 
 	// every time, based on a given seed
 	// Randomize the result further by only using prime numbers and normalize it
-	return (1.0f - (((Modifier* (Modifier * Modifier * 15731 + 789221) + 1376312589)) & 0x7fffffff) / 1073741824.0);
+	return (1.0f - (((modifier* (modifier * modifier * 15731 + 789221) + 1376312589)) & 0x7fffffff) / 1073741824.0);
 }
 
 // #TODO: Rewrite this, since there is allot of room for improvements
-double FNoise2D::InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod, int32 Seed)
+double FNoise2D::InterpolatedNoise(double x, double y, EInterpMethod interpMethod, int32 seed)
 {
 	// Single out the fractions of the coordinates
-	int32 IntegerX = X;
-	double FractionalX = X - IntegerX;
+	int32 integerX = x;
+	double fractionalX = x - integerX;
 
-	int32 IntegerY = Y;
-	double FractionalY = Y - IntegerY;
+	int32 integerY = y;
+	double fractionalY = y - integerY;
 
-	switch (InterpMethod)
-	{
-	case EInterpMethod::Lerp:
-	{
-		// X-values for y
-		double MinY[2];
-
-		// X-values for y + 1
-		double MaxY[2];
-
-		// Generate the raw noise data
-		MinY[0] = RawNoise(IntegerX, IntegerY, Seed);
-		MinY[1] = RawNoise(IntegerX + 1, IntegerY, Seed);
-
-		MaxY[0] = RawNoise(IntegerX, IntegerY + 1, Seed);
-		MaxY[1] = RawNoise(IntegerX + 1, IntegerY + 1, Seed);
-
-		// "Draw the graph" around the given x coordinate using interpolation
-		double MinYInterp = FInterpolation::Linear(MinY[0], MinY[1], FractionalX);
-		double MaxYInterp = FInterpolation::Linear(MaxY[0], MaxY[1], FractionalX);
-
-		// Interpolate between the two values based on the position on the y
-		return FInterpolation::Linear(MinYInterp, MaxYInterp, FractionalY);
-	}
-		break;
-	case EInterpMethod::Cosine:
+	// Generate the raw noise data
+	if (interpMethod == EInterpMethod::Lerp)
 	{
 		// X-values for y
-		double MinY[2];
+		double minY[2];
 
 		// X-values for y + 1
-		double MaxY[2];
+		double maxY[2];
 
 		// Generate the raw noise data
-		MinY[0] = RawNoise(IntegerX, IntegerY, Seed);
-		MinY[1] = RawNoise(IntegerX + 1, IntegerY, Seed);
+		minY[0] = RawNoise(integerX, integerY, seed);
+		minY[1] = RawNoise(integerX + 1, integerY, seed);
 
-		MaxY[0] = RawNoise(IntegerX, IntegerY + 1, Seed);
-		MaxY[1] = RawNoise(IntegerX + 1, IntegerY + 1, Seed);
+		maxY[0] = RawNoise(integerX, integerY + 1, seed);
+		maxY[1] = RawNoise(integerX + 1, integerY + 1, seed);
 
 		// "Draw the graph" around the given x coordinate using interpolation
-		double MinYInterp = FInterpolation::Cosine(MinY[0], MinY[1], FractionalX);
-		double MaxYInterp = FInterpolation::Cosine(MaxY[0], MaxY[1], FractionalX);
+		double minYInterp = FInterpolation::Linear(minY[0], minY[1], fractionalX);
+		double maxYInterp = FInterpolation::Linear(maxY[0], maxY[1], fractionalX);
 
 		// Interpolate between the two values based on the position on the y
-		return FInterpolation::Cosine(MinYInterp, MaxYInterp, FractionalY);
+		return FInterpolation::Linear(minYInterp, maxYInterp, fractionalY);
 	}
-		break;
-	case EInterpMethod::Cubic:
+	else if (interpMethod == EInterpMethod::Cosine)
+	{
+		// X-values for y
+		double minY[2];
 
+		// X-values for y + 1
+		double maxY[2];
+
+		// Generate the raw noise data
+		minY[0] = RawNoise(integerX, integerY, seed);
+		minY[1] = RawNoise(integerX + 1, integerY, seed);
+
+		maxY[0] = RawNoise(integerX, integerY + 1, seed);
+		maxY[1] = RawNoise(integerX + 1, integerY + 1, seed);
+
+		// "Draw the graph" around the given x coordinate using interpolation
+		double minYInterp = FInterpolation::Cosine(minY[0], minY[1], fractionalX);
+		double maxYInterp = FInterpolation::Cosine(maxY[0], maxY[1], fractionalX);
+
+		// Interpolate between the two values based on the position on the y
+		return FInterpolation::Cosine(minYInterp, maxYInterp, fractionalY);
+	}
+	else
+	{
 		// X-values for y + 2 
-		double SurroundingPoints[4][4];
+		double surroundingPoints[4][4];
 
 		// Generate the raw noise data
-		for (int32 Y = 0; Y < 4; Y++)
-		{
-			for (int32 X = 0; X < 4; X++)
-			{
-				SurroundingPoints[Y][X] = RawNoise(IntegerX + (X - 1), IntegerY + (Y - 1), Seed);
-			}
-		}
+		for (int32 y = 0; y < 4; y++)
+			for (int32 x = 0; x < 4; x++)
+				surroundingPoints[y][x] = RawNoise(integerX + (x - 1), integerY + (y - 1), seed);
 
 		// Stores the interpolated data for all x values
-		double XValues[4];
+		double xValues[4];
 
 		// "Draw the graph" around the given x coordinate using cubic interpolation
-		for (int32 Y = 0; Y < 4; Y++)
-		{
-			XValues[Y] = FInterpolation::Cubic(SurroundingPoints[Y][0], SurroundingPoints[Y][1], SurroundingPoints[Y][2], SurroundingPoints[Y][3], FractionalX);
-		}
+		for (int32 y = 0; y < 4; y++)
+			xValues[y] = FInterpolation::Cubic(surroundingPoints[y][0], surroundingPoints[y][1], surroundingPoints[y][2], surroundingPoints[y][3], fractionalX);
 
 		// Interpolate between all values based on the position on the y
-		return FInterpolation::Cubic(XValues[0], XValues[1], XValues[2], XValues[3], FractionalY);
-		break;
-	default:
-		return 0.0;
-		break;
+		return FInterpolation::Cubic(xValues[0], xValues[1], xValues[2], xValues[3], fractionalY);
 	}
 }
 
-double FNoise3D::RawNoise(int32 X, int32 Y, int32 Z, int32 Seed)
+double FNoise3D::RawNoise(int32 x, int32 y, int32 z, int32 seed)
 {
-	// Make sure that we never encounter any 0 coordinates since the outcome of all following operations would be 0
-	X = (X == 0 ? X - 1 : X);
-	Y = (Y == 0 ? Y - 1 : Y);
-	Z = (Z == 0 ? Z - 1 : Z);
-
 	// Doing some semi random operations on the modifier
-	int32 Modifier = X * 23 + Y * 57 + Z * 101 + Seed * 17;
-	Modifier = (Modifier << 13) ^ Modifier;
+	int32 modifier = x * 23 + y * 57 + z * 101 + seed * 17;
+	modifier = (modifier << 13) ^ modifier;
 
 	// TODO: Maybe use the in engine random number generator and some extra code to switch those hard coded prime numbers 
 	// every time, based on a given seed
 	// Randomize the result further by only using prime numbers and normalize it
-	return (1.0f - (((Modifier* (Modifier * Modifier * 15731 + 789221) + 1376312589)) & 0x7fffffff) / 1073741824.0);
+	return (1.0f - (((modifier* (modifier * modifier * 15731 + 789221) + 1376312589)) & 0x7fffffff) / 1073741824.0);
 }
 
-double FNoise3D::InterpolatedNoise(double X, double Y, double Z, EInterpMethod InterpMethod, int32 Seed)
+double FNoise3D::InterpolatedNoise(double x, double y, double z, EInterpMethod interpMethod, int32 seed)
 {
 	// Single out the fractions of the coordinates
-	int32 IntegerX = X;
-	double FractionalX = X - IntegerX;
+	int32 integerX = x;
+	double fractionalX = x - integerX;
 
-	int32 IntegerY = Y;
-	double FractionalY = Y - IntegerY;
+	int32 integerY = y;
+	double fractionalY = y - integerY;
 
-	int32 IntegerZ = Z;
-	double FractionalZ = Z - IntegerZ;
+	int32 integerZ = z;
+	double fractionalZ = z - integerZ;
 
-	if (InterpMethod == EInterpMethod::Lerp)
+	if (interpMethod == EInterpMethod::Lerp)
 	{
 		// Stores the raw noise values of an imaginary cube around the point we want to know the noise value of
 		//                 x  y  z
-		double NoiseValues[2][2][2] = { 0 };
+		double noiseValues[2][2][2];
 
 		// Lower layer
-		NoiseValues[0][0][0] = RawNoise(IntegerX, IntegerY, IntegerZ, Seed);
-		NoiseValues[1][0][0] = RawNoise(IntegerX + 1, IntegerY, IntegerZ, Seed);
-		NoiseValues[0][1][0] = RawNoise(IntegerX, IntegerY + 1, IntegerZ, Seed);
-		NoiseValues[1][1][0] = RawNoise(IntegerX + 1, IntegerY + 1, IntegerZ, Seed);
+		noiseValues[0][0][0] = RawNoise(integerX, integerY, integerZ, seed);
+		noiseValues[1][0][0] = RawNoise(integerX + 1, integerY, integerZ, seed);
+		noiseValues[0][1][0] = RawNoise(integerX, integerY + 1, integerZ, seed);
+		noiseValues[1][1][0] = RawNoise(integerX + 1, integerY + 1, integerZ, seed);
 
 		// Above layer
-		NoiseValues[0][0][1] = RawNoise(IntegerX, IntegerY, IntegerZ + 1, Seed);
-		NoiseValues[1][0][1] = RawNoise(IntegerX + 1, IntegerY, IntegerZ + 1, Seed);
-		NoiseValues[0][1][1] = RawNoise(IntegerX, IntegerY + 1, IntegerZ + 1, Seed);
-		NoiseValues[1][1][1] = RawNoise(IntegerX + 1, IntegerY + 1, IntegerZ + 1, Seed);
+		noiseValues[0][0][1] = RawNoise(integerX, integerY, integerZ + 1, seed);
+		noiseValues[1][0][1] = RawNoise(integerX + 1, integerY, integerZ + 1, seed);
+		noiseValues[0][1][1] = RawNoise(integerX, integerY + 1, integerZ + 1, seed);
+		noiseValues[1][1][1] = RawNoise(integerX + 1, integerY + 1, integerZ + 1, seed);
 
 		// Interpolate on the x first
 		//                   y  z
-		double InterpolatedX[2][2] = { 0 };
+		double interpolatedX[2][2];
 
-		InterpolatedX[0][0] = FInterpolation::Linear(NoiseValues[0][0][0], NoiseValues[1][0][0], FractionalX);
-		InterpolatedX[1][0] = FInterpolation::Linear(NoiseValues[0][1][0], NoiseValues[1][1][0], FractionalX);
-		InterpolatedX[0][1] = FInterpolation::Linear(NoiseValues[0][0][1], NoiseValues[1][0][1], FractionalX);
-		InterpolatedX[1][1] = FInterpolation::Linear(NoiseValues[0][1][1], NoiseValues[1][1][1], FractionalX);
+		interpolatedX[0][0] = FInterpolation::Linear(noiseValues[0][0][0], noiseValues[1][0][0], fractionalX);
+		interpolatedX[1][0] = FInterpolation::Linear(noiseValues[0][1][0], noiseValues[1][1][0], fractionalX);
+		interpolatedX[0][1] = FInterpolation::Linear(noiseValues[0][0][1], noiseValues[1][0][1], fractionalX);
+		interpolatedX[1][1] = FInterpolation::Linear(noiseValues[0][1][1], noiseValues[1][1][1], fractionalX);
 
 		// Interpolate on the y
 		//                   z
-		double InterpolatedY[2] = { 0 };
+		double interpolatedY[2];
 
-		InterpolatedY[0] = FInterpolation::Linear(InterpolatedX[0][0], InterpolatedX[1][0], FractionalY);
-		InterpolatedY[1] = FInterpolation::Linear(InterpolatedX[0][1], InterpolatedX[1][1], FractionalY);
+		interpolatedY[0] = FInterpolation::Linear(interpolatedX[0][0], interpolatedX[1][0], fractionalY);
+		interpolatedY[1] = FInterpolation::Linear(interpolatedX[0][1], interpolatedX[1][1], fractionalY);
 
 		// Interpolating the values left will give us the final value
-		return FInterpolation::Linear(InterpolatedY[0], InterpolatedY[1], FractionalZ);
+		return FInterpolation::Linear(interpolatedY[0], interpolatedY[1], fractionalZ);
 	}
-	else if (InterpMethod == EInterpMethod::Cosine)
+	else if (interpMethod == EInterpMethod::Cosine)
 	{
 		// Stores the raw noise values of an imaginary cube around the point we want to know the noise value of
 		//                 x  y  z
-		double NoiseValues[2][2][2] = { 0 };
+		double noiseValues[2][2][2];
 
 		// Lower layer
-		NoiseValues[0][0][0] = RawNoise(IntegerX, IntegerY, IntegerZ, Seed);
-		NoiseValues[1][0][0] = RawNoise(IntegerX + 1, IntegerY, IntegerZ, Seed);
-		NoiseValues[0][1][0] = RawNoise(IntegerX, IntegerY + 1, IntegerZ, Seed);
-		NoiseValues[1][1][0] = RawNoise(IntegerX + 1, IntegerY + 1, IntegerZ, Seed);
+		noiseValues[0][0][0] = RawNoise(integerX, integerY, integerZ, seed);
+		noiseValues[1][0][0] = RawNoise(integerX + 1, integerY, integerZ, seed);
+		noiseValues[0][1][0] = RawNoise(integerX, integerY + 1, integerZ, seed);
+		noiseValues[1][1][0] = RawNoise(integerX + 1, integerY + 1, integerZ, seed);
 
 		// Above layer
-		NoiseValues[0][0][1] = RawNoise(IntegerX, IntegerY, IntegerZ + 1, Seed);
-		NoiseValues[1][0][1] = RawNoise(IntegerX + 1, IntegerY, IntegerZ + 1, Seed);
-		NoiseValues[0][1][1] = RawNoise(IntegerX, IntegerY + 1, IntegerZ + 1, Seed);
-		NoiseValues[1][1][1] = RawNoise(IntegerX + 1, IntegerY + 1, IntegerZ + 1, Seed);
+		noiseValues[0][0][1] = RawNoise(integerX, integerY, integerZ + 1, seed);
+		noiseValues[1][0][1] = RawNoise(integerX + 1, integerY, integerZ + 1, seed);
+		noiseValues[0][1][1] = RawNoise(integerX, integerY + 1, integerZ + 1, seed);
+		noiseValues[1][1][1] = RawNoise(integerX + 1, integerY + 1, integerZ + 1, seed);
 
 		// Interpolate on the x first
 		//                   y  z
-		double InterpolatedX[2][2] = { 0 };
+		double interpolatedX[2][2];
 
-		InterpolatedX[0][0] = FInterpolation::Cosine(NoiseValues[0][0][0], NoiseValues[1][0][0], FractionalX);
-		InterpolatedX[1][0] = FInterpolation::Cosine(NoiseValues[0][1][0], NoiseValues[1][1][0], FractionalX);
-		InterpolatedX[0][1] = FInterpolation::Cosine(NoiseValues[0][0][1], NoiseValues[1][0][1], FractionalX);
-		InterpolatedX[1][1] = FInterpolation::Cosine(NoiseValues[0][1][1], NoiseValues[1][1][1], FractionalX);
+		interpolatedX[0][0] = FInterpolation::Cosine(noiseValues[0][0][0], noiseValues[1][0][0], fractionalX);
+		interpolatedX[1][0] = FInterpolation::Cosine(noiseValues[0][1][0], noiseValues[1][1][0], fractionalX);
+		interpolatedX[0][1] = FInterpolation::Cosine(noiseValues[0][0][1], noiseValues[1][0][1], fractionalX);
+		interpolatedX[1][1] = FInterpolation::Cosine(noiseValues[0][1][1], noiseValues[1][1][1], fractionalX);
 
 		// Interpolate on the y
 		//                   z
-		double InterpolatedY[2] = { 0 };
+		double interpolatedY[2];
 
-		InterpolatedY[0] = FInterpolation::Cosine(InterpolatedX[0][0], InterpolatedX[1][0], FractionalY);
-		InterpolatedY[1] = FInterpolation::Cosine(InterpolatedX[0][1], InterpolatedX[1][1], FractionalY);
+		interpolatedY[0] = FInterpolation::Cosine(interpolatedX[0][0], interpolatedX[1][0], fractionalY);
+		interpolatedY[1] = FInterpolation::Cosine(interpolatedX[0][1], interpolatedX[1][1], fractionalY);
 
 		// Interpolating the values left will give us the final value
-		return FInterpolation::Cosine(InterpolatedY[0], InterpolatedY[1], FractionalZ);
+		return FInterpolation::Cosine(interpolatedY[0], interpolatedY[1], fractionalZ);
 	}
-	else if (InterpMethod == EInterpMethod::Cubic)
+	else if (interpMethod == EInterpMethod::Cubic)
 	{
 		// Stores the raw noise values of an imaginary cube around the point we want to know the noise value of
 		// Because the cubic interpolation method requires more input points the imaginary cube is 2/3 bigger than before
 		//                 x  y  z
-		double NoiseValues[4][4][4] = { 0 };
+		double noiseValues[4][4][4];
 
-		for (int32 Z = 0; Z < 4; Z++)
-		{
-			for (int32 Y = 0; Y < 4; Y++)
-			{
-				for (int32 X = 0; X < 4; X++)
-				{
-					NoiseValues[X][Y][Z] = RawNoise(IntegerX + (X - 1), IntegerY + (Y - 1), IntegerZ + (Z - 1), Seed);
-				}
-			}
-		}
+		for (int32 z = 0; z < 4; z++)
+			for (int32 y = 0; y < 4; y++)
+				for (int32 x = 0; x < 4; x++)
+					noiseValues[x][y][z] = RawNoise(integerX + (x - 1), integerY + (y - 1), integerZ + (z - 1), seed);
 
 		// Interpolate on the x first
 		//                   y  z
@@ -284,7 +235,7 @@ double FNoise3D::InterpolatedNoise(double X, double Y, double Z, EInterpMethod I
 		{
 			for (int32 Y = 0; Y < 4; Y++)
 			{
-				InterpolatedX[Y][Z] = FInterpolation::Cubic(NoiseValues[0][Y][Z], NoiseValues[1][Y][Z], NoiseValues[2][Y][Z], NoiseValues[3][Y][Z], FractionalX);
+				InterpolatedX[Y][Z] = FInterpolation::Cubic(noiseValues[0][Y][Z], noiseValues[1][Y][Z], noiseValues[2][Y][Z], noiseValues[3][Y][Z], fractionalX);
 			}
 		}
 
@@ -292,13 +243,13 @@ double FNoise3D::InterpolatedNoise(double X, double Y, double Z, EInterpMethod I
 		//                   z
 		double InterpolatedY[4] = { 0 };
 
-		InterpolatedY[0] = FInterpolation::Cubic(InterpolatedX[0][0], InterpolatedX[1][0], InterpolatedX[2][0], InterpolatedX[3][0], FractionalY);
-		InterpolatedY[1] = FInterpolation::Cubic(InterpolatedX[0][1], InterpolatedX[1][1], InterpolatedX[2][1], InterpolatedX[3][1], FractionalY);
-		InterpolatedY[2] = FInterpolation::Cubic(InterpolatedX[0][2], InterpolatedX[1][2], InterpolatedX[2][2], InterpolatedX[3][2], FractionalY);
-		InterpolatedY[3] = FInterpolation::Cubic(InterpolatedX[0][3], InterpolatedX[1][3], InterpolatedX[2][3], InterpolatedX[3][3], FractionalY);
+		InterpolatedY[0] = FInterpolation::Cubic(InterpolatedX[0][0], InterpolatedX[1][0], InterpolatedX[2][0], InterpolatedX[3][0], fractionalY);
+		InterpolatedY[1] = FInterpolation::Cubic(InterpolatedX[0][1], InterpolatedX[1][1], InterpolatedX[2][1], InterpolatedX[3][1], fractionalY);
+		InterpolatedY[2] = FInterpolation::Cubic(InterpolatedX[0][2], InterpolatedX[1][2], InterpolatedX[2][2], InterpolatedX[3][2], fractionalY);
+		InterpolatedY[3] = FInterpolation::Cubic(InterpolatedX[0][3], InterpolatedX[1][3], InterpolatedX[2][3], InterpolatedX[3][3], fractionalY);
 
 		// Interpolating the values left will give us the final value
-		return FInterpolation::Cubic(InterpolatedY[0], InterpolatedY[1], InterpolatedY[2], InterpolatedY[3], FractionalZ);
+		return FInterpolation::Cubic(InterpolatedY[0], InterpolatedY[1], InterpolatedY[2], InterpolatedY[3], fractionalZ);
 	}
 	else
 	{

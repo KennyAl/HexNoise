@@ -4,19 +4,17 @@
 
 namespace HexNoise
 {
-	static const int32 DefaultSeed = 0;
-	static const EInterpMethod DefaultInterpMethod = EInterpMethod::Lerp;
-	static const bool DefaultSmooth = true;
-	static const float DefaultSmoothFaktor = 0.5f;
+	static const int32 defaultSeed = 0;
+	static const EInterpMethod defaultInterpMethod = EInterpMethod::Lerp;
 
 	class HEXNOISE_API FNoise1D
 	{
 
 	public:
 
-		static double RawNoise(int32 X, int32 Seed = DefaultSeed);
+		static double RawNoise(int32 x, int32 seed = defaultSeed);
 
-		static double InterpolatedNoise(double X, EInterpMethod InterpMethod = DefaultInterpMethod, int32 Seed = DefaultSeed);
+		static double InterpolatedNoise(double x, EInterpMethod interpMethod = defaultInterpMethod, int32 seed = defaultSeed);
 	};
 
 	class HEXNOISE_API FNoise2D
@@ -24,9 +22,9 @@ namespace HexNoise
 
 	public:
 
-		static double RawNoise(int32 X, int32 Y, int32 Seed = DefaultSeed);
+		static double RawNoise(int32 x, int32 y, int32 seed = defaultSeed);
 
-		static double InterpolatedNoise(double X, double Y, EInterpMethod InterpMethod = DefaultInterpMethod, int32 Seed = DefaultSeed);
+		static double InterpolatedNoise(double x, double y, EInterpMethod interpMethod = defaultInterpMethod, int32 seed = defaultSeed);
 	};
 
 	class HEXNOISE_API FNoise3D
@@ -34,9 +32,9 @@ namespace HexNoise
 
 	public:
 
-		static double RawNoise(int32 X, int32 Y, int32 Z, int32 Seed = DefaultSeed);
+		static double RawNoise(int32 x, int32 y, int32 z, int32 seed = defaultSeed);
 
-		static double InterpolatedNoise(double X, double Y, double Z, EInterpMethod InterpMethod = DefaultInterpMethod, int32 Seed = DefaultSeed);
+		static double InterpolatedNoise(double x, double y, double z, EInterpMethod interpMethod = defaultInterpMethod, int32 seed = defaultSeed);
 	};
 }
 

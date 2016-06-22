@@ -57,3 +57,22 @@ struct FPerlinNoiseSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PerlinNosie")
 	int32 Seed = 0;
 };
+
+USTRUCT(BlueprintType, meta=(DisplayName="Noise Value"))
+struct FNoiseValuesss
+{
+	GENERATED_USTRUCT_BODY()
+
+	FNoiseValuesss(double value = 0.0, double scale = 1.0): value(value), scale(scale){}
+	double value;
+
+	double scale;
+};
+
+UENUM(BlueprintType)
+enum class ECurveOptions : uint8
+{
+	LINEAR			UMETA(DisplayName = "Linear"),
+	EASED_CURVE		UMETA(DisplayName = "Eased Curve"),
+	CUSTOM			UMETA(DisplayName = "Custom")
+};
